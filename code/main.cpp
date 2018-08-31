@@ -21,7 +21,6 @@ int main(int argc, char** argv)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-
 	g_win = SDL_CreateWindow(
 		g_cap.c_str(),
 		SDL_WINDOWPOS_UNDEFINED,
@@ -36,7 +35,6 @@ int main(int argc, char** argv)
 	glewInit();
 
 	input_init();
-
 
 	game_init();
 
@@ -96,7 +94,6 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-
 
 std::string app_getCaption()
 {

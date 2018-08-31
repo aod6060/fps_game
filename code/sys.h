@@ -15,8 +15,9 @@
 #include <limits>
 
 #include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
+
+#include <freeimage/FreeImage.h>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -101,6 +102,25 @@ public:
 };
 
 // Index Buffer
+class IndexBuffer
+{
+private:
+	uint32_t id;
+	std::vector<uint32_t> list;
+public:
+	void add(uint32_t x);
+	void add(uint32_t x, uint32_t y);
+	void add(uint32_t x, uint32_t y, uint32_t z);
+	void add(uint32_t x, uint32_t y, uint32_t z, uint32_t w);
+	void clear();
+	void create();
+	void upload();
+	void bind();
+	void unbind();
+	void release();
+	uint32_t size();
+};
+
 // Attributes
 class Attributes
 {
@@ -192,5 +212,31 @@ public:
 	Uniforms* getUniforms();
 	uint32_t getID();
 };
+
 // Texture2D
+class Texture2D
+{
+private:
+	uint32_t id = 0;
+	uint32_t width = 1;
+	uint32_t height = 1;
+
+	//std::vector<uint32_t> getContents(std::string path, uint32_t& w, uint32_t& h);
+public:
+
+	void init(std::string path);
+
+	void bind(GLenum type);
+
+	void unbind(GLenum type);
+
+	void release();
+
+	uint32_t getWidth();
+
+	uint32_t getHeight();
+
+	uint32_t getID();
+
+};
 // CubeMap

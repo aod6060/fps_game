@@ -61,6 +61,7 @@ void VertexBuffer::upload()
 
 void VertexBuffer::bind()
 {
+	// Oo0RHzmRjCM
 	glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 

@@ -9,6 +9,12 @@ static Program prog;
 static VertexBuffer vBuf;
 // Color Buffer
 static VertexBuffer cBuf;
+// TexCoords Buffer
+static VertexBuffer tBuf;
+// Index Buffer
+static IndexBuffer iBuf;
+// Texture2D
+static Texture2D texExample;
 
 static float rot = 0.0f;
 
@@ -29,24 +35,29 @@ void game_init()
 	// Attributes
 	prog.getAttr()->set("vertices", 0);
 	prog.getAttr()->set("vertexColors", 1);
+	prog.getAttr()->set("texCoords", 2);
 	prog.getAttr()->bind();
 	prog.getAttr()->enable("vertices");
 	prog.getAttr()->enable("vertexColors");
+	prog.getAttr()->enable("texCoords");
 	prog.getAttr()->unbind();
 	prog.getAttr()->disable("vertices");
 	prog.getAttr()->disable("vertexColors");
+	prog.getAttr()->disable("texCoords");
 
 	// Uniforms
 	prog.getUniforms()->create("proj");
 	prog.getUniforms()->create("view");
 	prog.getUniforms()->create("model");
-
+	prog.getUniforms()->create("tex0");
+	prog.getUniforms()->set1i("tex0", 0);
 	prog.unbind();
 
 	// Vertex Buffer
-	vBuf.add(0.0f, 1.0f, 0.0f);
-	vBuf.add(1.0f, -1.0f, 0.0f);
+	vBuf.add(-1.0f, 1.0f, 0.0f);
+	vBuf.add(1.0f, 1.0f, 0.0f);
 	vBuf.add(-1.0f, -1.0f, 0.0f);
+	vBuf.add(1.0f, -1.0f, 0.0f);
 	vBuf.create();
 	vBuf.upload();
 
@@ -54,10 +65,26 @@ void game_init()
 	cBuf.add(1.0f, 0.0f, 0.0f, 1.0f);
 	cBuf.add(0.0f, 1.0f, 0.0f, 1.0f);
 	cBuf.add(0.0f, 0.0f, 1.0f, 1.0f);
+	cBuf.add(1.0f, 1.0f, 0.0f, 1.0f);
 	cBuf.create();
 	cBuf.upload();
 
+	// TexCoords Buffer
+	tBuf.add(0.0f, 0.0f);
+	tBuf.add(1.0f, 0.0f);
+	tBuf.add(0.0f, 1.0f);
+	tBuf.add(1.0f, 1.0f);
+	tBuf.create();
+	tBuf.upload();
 
+	// Index Buffer
+	iBuf.add(0, 1, 2);
+	iBuf.add(2, 1, 3);
+	iBuf.create();
+	iBuf.upload();
+
+	// Texture2D
+	texExample.init("data/textures/happyface.png");
 }
 
 void game_update(float delta)
@@ -103,6 +130,10 @@ void game_render()
 
 	prog.getAttr()->bind();
 
+	// https://www.youtube.com/watch?v=t3Dlt_wyLTg
+
+	//texExample.bind(GL_TEXTURE0);
+
 	vBuf.bind();
 	prog.getAttr()->pointer("vertices", 3, GL_FLOAT);
 	vBuf.unbind();
@@ -111,7 +142,16 @@ void game_render()
 	prog.getAttr()->pointer("vertexColors", 4, GL_FLOAT);
 	cBuf.unbind();
 
-	glDrawArrays(GL_TRIANGLES, 0, vBuf.size() / 3);
+	tBuf.bind();
+	prog.getAttr()->pointer("texCoords", 2, GL_FLOAT);
+	tBuf.unbind();
+
+	iBuf.bind();
+	//glDrawArrays(GL_TRIANGLES, 0, vBuf.size() / 3);
+	glDrawElements(GL_TRIANGLES, iBuf.size(), GL_UNSIGNED_INT, 0);
+	iBuf.unbind();
+
+	//texExample.unbind(GL_TEXTURE0);
 
 	prog.getAttr()->unbind();
 
@@ -120,6 +160,9 @@ void game_render()
 
 void game_release()
 {
+	texExample.release();
+	iBuf.release();
+	tBuf.release();
 	cBuf.release();
 	vBuf.release();
 	prog.release();
