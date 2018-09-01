@@ -25,6 +25,7 @@
 #include <GL/glew.h>
 
 #include <rapidjson/document.h>
+
 #include <BP/btBulletDynamicsCommon.h>
 
 // Enumerations
@@ -92,6 +93,10 @@ public:
 	void add(const glm::vec3& v);
 	void add(float x, float y, float z, float w);
 	void add(const glm::vec4& v);
+	void addAll(std::vector<float>& v);
+	void addAll(std::vector<glm::vec2>& v);
+	void addAll(std::vector<glm::vec3>& v);
+	void addAll(std::vector<glm::vec4>& v);
 	void clear();
 	void create();
 	void upload();
@@ -112,6 +117,10 @@ public:
 	void add(uint32_t x, uint32_t y);
 	void add(uint32_t x, uint32_t y, uint32_t z);
 	void add(uint32_t x, uint32_t y, uint32_t z, uint32_t w);
+	void addAll(std::vector<uint32_t>& v);
+	void addAll(std::vector<glm::ivec2>& v);
+	void addAll(std::vector<glm::ivec3>& v);
+	void addAll(std::vector<glm::ivec4>& v);
 	void clear();
 	void create();
 	void upload();
@@ -240,3 +249,24 @@ public:
 
 };
 // CubeMap
+
+
+
+// Meshes
+class Mesh
+{
+private:
+	VertexBuffer vBuf;
+	VertexBuffer tBuf;
+	VertexBuffer nBuf;
+
+	IndexBuffer iBuf;
+
+public:
+
+	void init(std::string path);
+
+	void render(Program& prog);
+
+	void release();
+};

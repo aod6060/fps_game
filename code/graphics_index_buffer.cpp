@@ -63,3 +63,35 @@ uint32_t IndexBuffer::size()
 {
 	return list.size();
 }
+
+void IndexBuffer::addAll(std::vector<uint32_t>& v)
+{
+	for (uint32_t i = 0; i < v.size(); i++)
+	{
+		add(v[i]);
+	}
+}
+
+void IndexBuffer::addAll(std::vector<glm::ivec2>& v)
+{
+	for (uint32_t i = 0; i < v.size(); i++)
+	{
+		add(v[i].x, v[i].y);
+	}
+}
+
+void IndexBuffer::addAll(std::vector<glm::ivec3>& v)
+{
+	for (uint32_t i = 0; i < v.size(); i++)
+	{
+		add(v[i].x, v[i].y, v[i].z);
+	}
+}
+
+void IndexBuffer::addAll(std::vector<glm::ivec4>& v)
+{
+	for (uint32_t i = 0; i < v.size(); i++)
+	{
+		add(v[i].x, v[i].y, v[i].z, v[i].w);
+	}
+}

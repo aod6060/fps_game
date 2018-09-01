@@ -79,3 +79,35 @@ uint32_t VertexBuffer::size()
 {
 	return list.size();
 }
+
+void VertexBuffer::addAll(std::vector<float>& v)
+{
+	for (uint32_t i = 0; i < v.size(); i++)
+	{
+		this->add(v[i]);
+	}
+}
+
+void VertexBuffer::addAll(std::vector<glm::vec2>& v)
+{
+	for (uint32_t i = 0; i < v.size(); i++)
+	{
+		this->add(v[i]);
+	}
+}
+
+void VertexBuffer::addAll(std::vector<glm::vec3>& v)
+{
+	for (uint32_t i = 0; i < v.size(); i++)
+	{
+		this->add(v[i]);
+	}
+}
+
+void VertexBuffer::addAll(std::vector<glm::vec4>& v)
+{
+	for (uint32_t i = 0; i < v.size(); i++)
+	{
+		this->add(v[i]);
+	}
+}

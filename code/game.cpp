@@ -5,16 +5,10 @@ static Shader vertex;
 static Shader frag;
 // Program
 static Program prog;
-// Vertex Buffer
-static VertexBuffer vBuf;
-// Color Buffer
-static VertexBuffer cBuf;
-// TexCoords Buffer
-static VertexBuffer tBuf;
-// Index Buffer
-static IndexBuffer iBuf;
 // Texture2D
 static Texture2D texExample;
+// Meshes
+static Mesh cube;
 
 static float rot = 0.0f;
 
@@ -34,16 +28,16 @@ void game_init()
 
 	// Attributes
 	prog.getAttr()->set("vertices", 0);
-	prog.getAttr()->set("vertexColors", 1);
-	prog.getAttr()->set("texCoords", 2);
+	prog.getAttr()->set("texCoords", 1);
+	prog.getAttr()->set("normals", 2);
 	prog.getAttr()->bind();
 	prog.getAttr()->enable("vertices");
-	prog.getAttr()->enable("vertexColors");
 	prog.getAttr()->enable("texCoords");
+	prog.getAttr()->enable("normals");
 	prog.getAttr()->unbind();
 	prog.getAttr()->disable("vertices");
-	prog.getAttr()->disable("vertexColors");
 	prog.getAttr()->disable("texCoords");
+	prog.getAttr()->disable("normals");
 
 	// Uniforms
 	prog.getUniforms()->create("proj");
@@ -53,38 +47,12 @@ void game_init()
 	prog.getUniforms()->set1i("tex0", 0);
 	prog.unbind();
 
-	// Vertex Buffer
-	vBuf.add(-1.0f, 1.0f, 0.0f);
-	vBuf.add(1.0f, 1.0f, 0.0f);
-	vBuf.add(-1.0f, -1.0f, 0.0f);
-	vBuf.add(1.0f, -1.0f, 0.0f);
-	vBuf.create();
-	vBuf.upload();
-
-	// Color Buffer
-	cBuf.add(1.0f, 0.0f, 0.0f, 1.0f);
-	cBuf.add(0.0f, 1.0f, 0.0f, 1.0f);
-	cBuf.add(0.0f, 0.0f, 1.0f, 1.0f);
-	cBuf.add(1.0f, 1.0f, 0.0f, 1.0f);
-	cBuf.create();
-	cBuf.upload();
-
-	// TexCoords Buffer
-	tBuf.add(0.0f, 0.0f);
-	tBuf.add(1.0f, 0.0f);
-	tBuf.add(0.0f, 1.0f);
-	tBuf.add(1.0f, 1.0f);
-	tBuf.create();
-	tBuf.upload();
-
-	// Index Buffer
-	iBuf.add(0, 1, 2);
-	iBuf.add(2, 1, 3);
-	iBuf.create();
-	iBuf.upload();
-
 	// Texture2D
 	texExample.init("data/textures/happyface.png");
+
+	// Meshes
+	cube.init("data/meshes/cube.blend");
+
 }
 
 void game_update(float delta)
@@ -116,8 +84,9 @@ void game_render()
 		glm::mat4(1.0f);
 
 	glm::mat4 model =
-		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f)) *
-		glm::rotate(glm::mat4(1.0f), glm::radians(rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * 
+		glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
+		//glm::rotate(glm::mat4(1.0f), glm::radians(rot), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	glClearColor(TO_FLOAT_C(0), TO_FLOAT_C(191), TO_FLOAT_C(255), 1.0F);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -128,12 +97,19 @@ void game_render()
 	prog.getUniforms()->setMat4("view", view);
 	prog.getUniforms()->setMat4("model", model);
 
-	prog.getAttr()->bind();
+
+
+	texExample.bind(GL_TEXTURE0);
+	cube.render(prog);
+	texExample.unbind(GL_TEXTURE0);
+
+	//prog.getAttr()->bind();
 
 	// https://www.youtube.com/watch?v=t3Dlt_wyLTg
 
-	//texExample.bind(GL_TEXTURE0);
 
+	//texExample.bind(GL_TEXTURE0);
+	/*
 	vBuf.bind();
 	prog.getAttr()->pointer("vertices", 3, GL_FLOAT);
 	vBuf.unbind();
@@ -152,19 +128,18 @@ void game_render()
 	iBuf.unbind();
 
 	//texExample.unbind(GL_TEXTURE0);
+	*/
 
-	prog.getAttr()->unbind();
+
+	//prog.getAttr()->unbind();
 
 	prog.unbind();
 }
 
 void game_release()
 {
+	cube.release();
 	texExample.release();
-	iBuf.release();
-	tBuf.release();
-	cBuf.release();
-	vBuf.release();
 	prog.release();
 	frag.release();
 	vertex.release();
