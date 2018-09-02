@@ -21,6 +21,8 @@ void Attributes::pointer(
 	uint32_t size, 
 	GLenum type)
 {
+	//std::cout << this->attributes[name] << std::endl;
+
 	glVertexAttribPointer(
 		this->attributes[name], 
 		size, 

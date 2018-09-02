@@ -19,4 +19,5 @@ void main()
 {
 	//out_Color = out_VertexColors;
 	out_Color = texture(tex0, v_TexCoords);
+	//out_Color = vec4(1.0);
 }

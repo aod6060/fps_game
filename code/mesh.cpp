@@ -42,14 +42,14 @@ void Mesh::init(std::string path)
 		// Vertices
 		glm::vec3 v;
 		v.x = mesh->mVertices[i].x;
-		v.y = mesh->mVertices[i].y;
-		v.z = mesh->mVertices[i].z;
+		v.y = mesh->mVertices[i].z;
+		v.z = mesh->mVertices[i].y;
 		vertices.push_back(v);
 		// Normals
 		glm::vec3 vn;
 		vn.x = mesh->mNormals[i].x;
-		vn.y = mesh->mNormals[i].y;
-		vn.z = mesh->mNormals[i].z;
+		vn.y = mesh->mNormals[i].z;
+		vn.z = mesh->mNormals[i].y;
 		normals.push_back(vn);
 		// TexCoords
 		glm::vec2 vt;
@@ -66,7 +66,7 @@ void Mesh::init(std::string path)
 		aiFace face = mesh->mFaces[i];
 		for (uint32_t j = 0; j < face.mNumIndices; j++)
 		{
-			indexes.push_back(face.mIndices[i]);
+			indexes.push_back(face.mIndices[j]);
 		}
 	}
 
@@ -93,7 +93,10 @@ void Mesh::init(std::string path)
 	iBuf.create();
 	iBuf.upload();
 
-
+	std::cout << vBuf.size() << std::endl;
+	std::cout << tBuf.size() << std::endl;
+	std::cout << nBuf.size() << std::endl;
+	std::cout << iBuf.size() << std::endl;
 }
 
 void Mesh::render(Program& prog)

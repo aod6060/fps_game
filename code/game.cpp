@@ -9,8 +9,22 @@ static Program prog;
 static Texture2D texExample;
 // Meshes
 static Mesh cube;
+static Mesh sphere;
+static Mesh cylinder;
+static Mesh monkey;
 
 static float rot = 0.0f;
+
+enum MeshType
+{
+	MT_CUBE = 0,
+	MT_SPHERE,
+	MT_CYLINDER,
+	MT_MONKEY,
+	MT_SIZE
+};
+
+static MeshType meshType = MeshType::MT_CUBE;
 
 void game_init()
 {
@@ -52,7 +66,9 @@ void game_init()
 
 	// Meshes
 	cube.init("data/meshes/cube.blend");
-
+	sphere.init("data/meshes/sphere.blend");
+	cylinder.init("data/meshes/cylender.blend");
+	monkey.init("data/meshes/monkey.blend");
 }
 
 void game_update(float delta)
@@ -61,6 +77,16 @@ void game_update(float delta)
 	if (rot > 0)
 	{
 		rot -= 360.0f;
+	}
+
+	if (input_isKeyDown(SDL_SCANCODE_TAB))
+	{
+		meshType = (MeshType)(meshType + 1);
+	}
+
+	if (meshType >= MT_SIZE)
+	{
+		meshType = MT_CUBE;
 	}
 }
 
@@ -84,9 +110,9 @@ void game_render()
 		glm::mat4(1.0f);
 
 	glm::mat4 model =
-		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)) * 
-		glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
-		//glm::rotate(glm::mat4(1.0f), glm::radians(rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f)) * 
+		//glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
+		glm::rotate(glm::mat4(1.0f), glm::radians(rot), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	glClearColor(TO_FLOAT_C(0), TO_FLOAT_C(191), TO_FLOAT_C(255), 1.0F);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -97,47 +123,34 @@ void game_render()
 	prog.getUniforms()->setMat4("view", view);
 	prog.getUniforms()->setMat4("model", model);
 
-
-
 	texExample.bind(GL_TEXTURE0);
-	cube.render(prog);
+	
+	switch (meshType)
+	{
+	case MT_CUBE:
+		cube.render(prog);
+		break;
+	case MT_SPHERE:
+		sphere.render(prog);
+		break;
+	case MT_CYLINDER:
+		cylinder.render(prog);
+		break;
+	case MT_MONKEY:
+		monkey.render(prog);
+		break;
+	}
+
 	texExample.unbind(GL_TEXTURE0);
-
-	//prog.getAttr()->bind();
-
-	// https://www.youtube.com/watch?v=t3Dlt_wyLTg
-
-
-	//texExample.bind(GL_TEXTURE0);
-	/*
-	vBuf.bind();
-	prog.getAttr()->pointer("vertices", 3, GL_FLOAT);
-	vBuf.unbind();
-
-	cBuf.bind();
-	prog.getAttr()->pointer("vertexColors", 4, GL_FLOAT);
-	cBuf.unbind();
-
-	tBuf.bind();
-	prog.getAttr()->pointer("texCoords", 2, GL_FLOAT);
-	tBuf.unbind();
-
-	iBuf.bind();
-	//glDrawArrays(GL_TRIANGLES, 0, vBuf.size() / 3);
-	glDrawElements(GL_TRIANGLES, iBuf.size(), GL_UNSIGNED_INT, 0);
-	iBuf.unbind();
-
-	//texExample.unbind(GL_TEXTURE0);
-	*/
-
-
-	//prog.getAttr()->unbind();
 
 	prog.unbind();
 }
 
 void game_release()
 {
+	monkey.release();
+	cylinder.release();
+	sphere.release();
 	cube.release();
 	texExample.release();
 	prog.release();
