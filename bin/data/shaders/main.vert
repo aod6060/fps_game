@@ -20,10 +20,12 @@ uniform mat4 model;
 // Varying
 out vec2 v_TexCoords;
 out vec3 v_Normals;
+out vec3 v_TexCoords2;
 
 void main()
 {
 	gl_Position = proj * view * model * vec4(vertices, 1.0);
 	v_TexCoords = texCoords;
 	v_Normals = normals;
+	v_TexCoords2 = vertices;
 }

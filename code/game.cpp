@@ -7,6 +7,8 @@ static Shader frag;
 static Program prog;
 // Texture2D
 static Texture2D texExample;
+static CubeMap cubeMap;
+
 // Meshes
 static Mesh cube;
 static Mesh sphere;
@@ -59,10 +61,15 @@ void game_init()
 	prog.getUniforms()->create("model");
 	prog.getUniforms()->create("tex0");
 	prog.getUniforms()->set1i("tex0", 0);
+	prog.getUniforms()->create("cube0");
+	prog.getUniforms()->set1i("cube0", 1);
 	prog.unbind();
 
 	// Texture2D
 	texExample.init("data/textures/happyface.png");
+
+	// CubeMap
+	cubeMap.init("data/textures/skybox/skybox.json");
 
 	// Meshes
 	cube.init("data/meshes/cube.blend");
@@ -112,7 +119,7 @@ void game_render()
 	glm::mat4 model =
 		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f)) * 
 		//glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
-		glm::rotate(glm::mat4(1.0f), glm::radians(rot), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::rotate(glm::mat4(1.0f), glm::radians(rot), glm::vec3(1.0f, 1.0f, 1.0f));
 
 	glClearColor(TO_FLOAT_C(0), TO_FLOAT_C(191), TO_FLOAT_C(255), 1.0F);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -124,7 +131,7 @@ void game_render()
 	prog.getUniforms()->setMat4("model", model);
 
 	texExample.bind(GL_TEXTURE0);
-	
+	cubeMap.bind(GL_TEXTURE1);
 	switch (meshType)
 	{
 	case MT_CUBE:
@@ -141,6 +148,7 @@ void game_render()
 		break;
 	}
 
+	cubeMap.unbind(GL_TEXTURE1);
 	texExample.unbind(GL_TEXTURE0);
 
 	prog.unbind();
@@ -152,6 +160,7 @@ void game_release()
 	cylinder.release();
 	sphere.release();
 	cube.release();
+	cubeMap.release();
 	texExample.release();
 	prog.release();
 	frag.release();

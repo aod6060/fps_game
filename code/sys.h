@@ -248,8 +248,30 @@ public:
 	uint32_t getID();
 
 };
-// CubeMap
 
+// CubeMap
+class CubeMap
+{
+private:
+	uint32_t id;
+
+	FIBITMAP* getContent(std::string path);
+
+	std::string getContents(std::string path);
+
+	void loadCubemapTextures(rapidjson::Value& textures);
+
+public:
+
+	void init(std::string path);
+
+	void bind(GLenum type);
+
+	void unbind(GLenum type);
+
+	void release();
+
+};
 
 
 // Meshes

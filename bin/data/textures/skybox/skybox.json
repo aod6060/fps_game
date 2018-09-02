@@ -1,0 +1,12 @@
+{
+	"type": "skybox",
+	"version": 1,
+	"textures": {
+		"left": "data/textures/skybox/left.png",
+		"right": "data/textures/skybox/right.png",
+		"back": "data/textures/skybox/back.png",
+		"front": "data/textures/skybox/front.png",
+		"down": "data/textures/skybox/down.png",
+		"up": "data/textures/skybox/up.png"
+	}
+}

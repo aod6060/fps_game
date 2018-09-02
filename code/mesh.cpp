@@ -22,13 +22,7 @@ void Mesh::init(std::string path)
 	uint32_t numMesh = root->mNumMeshes;
 	uint32_t numChild = root->mNumChildren;
 
-	std::cout << numMesh << std::endl;
-	std::cout << numChild << std::endl;
-
 	const aiNode* child = root->mChildren[root->mNumChildren - 1];
-
-	std::cout << child->mNumMeshes << std::endl;
-	std::cout << child->mNumChildren << std::endl;
 
 	aiMesh* mesh = scene->mMeshes[child->mMeshes[child->mNumMeshes - 1]];
 
@@ -70,9 +64,6 @@ void Mesh::init(std::string path)
 		}
 	}
 
-	std::cout << vertices.size() << ", " << normals.size() << ", " << texCoords.size() << std::endl;
-	std::cout << indexes.size() << std::endl;
-
 	// Vertex Buffer
 	vBuf.addAll(vertices);
 	vBuf.create();
@@ -92,11 +83,6 @@ void Mesh::init(std::string path)
 	iBuf.addAll(indexes);
 	iBuf.create();
 	iBuf.upload();
-
-	std::cout << vBuf.size() << std::endl;
-	std::cout << tBuf.size() << std::endl;
-	std::cout << nBuf.size() << std::endl;
-	std::cout << iBuf.size() << std::endl;
 }
 
 void Mesh::render(Program& prog)
