@@ -9,7 +9,14 @@ static InputState keys[SDL_NUM_SCANCODES];
 static InputState mouseB[MBT_SIZE];
 
 // Mouse Positoin
-static glm::vec2 pos;
+//static glm::vec2 pos;
+static bool isGrab = false;
+static int mx = 0;
+static int my = 0;
+static int preMX = 0;
+static int preMY = 0;
+static int mx_rel = 0;
+static int my_rel = 0;
 
 // Event Methdos
 static void _onKeyDown(SDL_KeyboardEvent& key);
@@ -33,7 +40,6 @@ void input_init()
 		mouseB[i] = IS_RELEASE;
 	}
 	// Position
-	pos = glm::vec2(0, 0);
 }
 
 void input_event(SDL_Event& e)
@@ -84,11 +90,44 @@ void input_update()
 			mouseB[i] = IS_RELEASE;
 		}
 	}
+
 	// Position
 	if (input_isGrab())
 	{
-		pos.x = 0;
-		pos.y = 0;
+		//std::cout << "Relative Mode" << std::endl;
+
+		// Mouse X Position
+		if (mx == 0)
+		{
+			mx = app_getWidth() / 2;
+			preMX = app_getWidth() / 2;
+			SDL_WarpMouseInWindow(app_getWindow(), mx, my);
+		}
+		else if (mx == app_getWidth() - 1)
+		{
+			mx = app_getWidth() / 2;
+			preMX = app_getWidth() / 2;
+			SDL_WarpMouseInWindow(app_getWindow(), mx, my);
+		}
+
+		if (my == 0)
+		{
+			my = app_getHeight() / 2;
+			preMY = app_getHeight() / 2;
+			SDL_WarpMouseInWindow(app_getWindow(), mx, my);
+		}
+		else if (my == app_getHeight() - 1)
+		{
+			my = app_getHeight() / 2;
+			preMY = app_getHeight() / 2;
+			SDL_WarpMouseInWindow(app_getWindow(), mx, my);
+		}
+
+		mx_rel = mx - preMX;
+		my_rel = my - preMY;
+
+		preMX = mx;
+		preMY = my;
 	}
 }
 
@@ -136,17 +175,49 @@ bool input_isMouseUp(MouseButtonType type)
 
 void input_mousePosition(glm::vec2& v)
 {
-	v = pos;
+	if (input_isGrab())
+	{
+		v.x = mx_rel;
+		v.y = my_rel;
+	}
+	else
+	{
+		v.x = mx;
+		v.y = my;
+	}
 }
 
 void input_setGrab(bool b)
 {
-	SDL_SetRelativeMouseMode((b) ? SDL_TRUE : SDL_FALSE);
+	//SDL_SetRelativeMouseMode((b) ? SDL_TRUE : SDL_FALSE);
+	isGrab = b;
+
+
+	if (isGrab)
+	{
+		SDL_SetWindowGrab(app_getWindow(), SDL_TRUE);
+		mx = app_getWidth() / 2;
+		my = app_getHeight() / 2;
+		preMX = mx;
+		preMY = my;
+
+		//SDL_WarpMouseGlobal(mx, my);
+
+		SDL_WarpMouseInWindow(app_getWindow(), mx, my);
+
+		SDL_ShowCursor(0);
+	}
+	else
+	{
+		SDL_SetWindowGrab(app_getWindow(), SDL_FALSE);
+		SDL_ShowCursor(1);
+	}
 }
 
 bool input_isGrab()
 {
-	return SDL_GetRelativeMouseMode() ? true : false;
+	//return SDL_GetRelativeMouseMode() ? true : false;
+	return isGrab;
 }
 
 void input_toggleGrab()
@@ -191,14 +262,6 @@ void _onMouseButtonUp(SDL_MouseButtonEvent& mb)
 
 void _onMouseMotion(SDL_MouseMotionEvent& mt)
 {
-	if (input_isGrab())
-	{
-		pos.x = mt.xrel;
-		pos.y = mt.yrel;
-	}
-	else
-	{
-		pos.x = mt.x;
-		pos.y = mt.y;
-	}
+	mx = mt.x;
+	my = mt.y;
 }

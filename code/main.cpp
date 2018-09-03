@@ -115,3 +115,8 @@ void app_exit()
 {
 	g_running = false;
 }
+
+SDL_Window* app_getWindow()
+{
+	return g_win;
+}

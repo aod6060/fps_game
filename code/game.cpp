@@ -145,10 +145,19 @@ void game_update(float delta)
 		input_toggleGrab();
 	}
 
+	
 	if (input_isGrab())
 	{
 		camera.update(delta);
+
+		/*
+		glm::vec2 mc;
+		input_mousePosition(mc);
+
+		std::cout << mc.x << ", " << mc.y << std::endl;
+		*/
 	}
+	
 
 	pulseTime += delta * 0.25f;
 

@@ -6,7 +6,7 @@ void Camera::init(const glm::vec3& pos, const glm::vec2& rot)
 	this->setPos(pos);
 	this->setRot(rot);
 
-	this->rotSpeed = 256.0f;
+	this->rotSpeed = 128.0f;
 }
 
 void Camera::update(float delta)
@@ -15,8 +15,10 @@ void Camera::update(float delta)
 
 	input_mousePosition(mc);
 
-	rot.y += this->rotSpeed * mc.x * delta;
-	rot.x += this->rotSpeed * mc.y * delta;
+	rot.y += this->rotSpeed * mc.x * ((delta - 0.001f < 0) ? 0.001f : delta);
+	rot.x += this->rotSpeed * mc.y * ((delta - 0.001f < 0) ? 0.001f : delta);
+
+	//std::cout << rot.x << ", " << rot.y << std::endl;
 
 	if (rot.x < -90.0f)
 	{
@@ -37,9 +39,6 @@ void Camera::update(float delta)
 	{
 		rot.y -= 360.0f;
 	}
-
-
-	std::cout << rot.x << ", " << rot.y << std::endl;
 
 	float yrad = glm::radians(rot.y);
 

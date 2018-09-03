@@ -52,6 +52,7 @@ std::string app_getCaption();
 uint32_t app_getWidth();
 uint32_t app_getHeight();
 void app_exit();
+SDL_Window* app_getWindow();
 
 // Input
 void input_init();
@@ -321,4 +322,23 @@ public:
 
 	float getRotSpeed();
 	void setRotSpeed(float rotSpeed);
+};
+
+// Terrain
+class Terrain
+{
+private:
+	VertexBuffer vBuf;
+	VertexBuffer tBuf;
+	VertexBuffer nBuf;
+
+	IndexBuffer iBuf;
+
+	std::vector<float> heights;
+
+	float scale = 20.0f;
+
+
+public:
+
 };
