@@ -15,7 +15,41 @@ static Mesh sphere;
 static Mesh cylinder;
 static Mesh monkey;
 
+// Camera
+static Camera camera;
+
+// Color
+
+static std::vector<glm::vec3> colors = {
+	glm::vec3(1.0f),
+	glm::vec3(1.0f, 0.0f, 0.0f),
+	glm::vec3(0.0f, 1.0f, 0.0f),
+	glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(1.0f, 1.0f, 0.0f),
+	glm::vec3(1.0f, 0.0f, 1.0f),
+	glm::vec3(0.0f, 1.0f, 1.0f),
+	glm::vec3(1.0f, 0.5f, 0.0f),
+	glm::vec3(1.0f, 0.0f, 0.5f),
+	glm::vec3(0.5f, 1.0f, 0.0f),
+	glm::vec3(0.0f, 1.0f, 0.5f),
+	glm::vec3(0.5f, 0.0f, 1.0f),
+	glm::vec3(0.0f, 0.5f, 1.0f),
+	glm::vec3(1.0f, 0.5f, 0.5f),
+	glm::vec3(0.5f, 1.0f, 0.5f),
+	glm::vec3(0.5f, 0.5f, 1.0f),
+	glm::vec3(0.5f, 0.5f, 0.5f),
+	glm::vec3(0.0f)
+};
+
+float pulseTime = 0.0f;
+uint32_t index = 0;
+uint32_t index2 = 1;
+
 static float rot = 0.0f;
+
+void renderMesh(const glm::vec3& pos);
+uint32_t getColorIndex();
+uint32_t getColorIndex2();
 
 enum MeshType
 {
@@ -63,6 +97,7 @@ void game_init()
 	prog.getUniforms()->set1i("tex0", 0);
 	prog.getUniforms()->create("cube0");
 	prog.getUniforms()->set1i("cube0", 1);
+	prog.getUniforms()->create("color");
 	prog.unbind();
 
 	// Texture2D
@@ -76,6 +111,15 @@ void game_init()
 	sphere.init("data/meshes/sphere.blend");
 	cylinder.init("data/meshes/cylender.blend");
 	monkey.init("data/meshes/monkey.blend");
+
+	// Camera
+	camera.init(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f));
+
+	index = getColorIndex();
+	index2 = getColorIndex2();
+
+	input_setGrab(true);
+
 }
 
 void game_update(float delta)
@@ -86,7 +130,7 @@ void game_update(float delta)
 		rot -= 360.0f;
 	}
 
-	if (input_isKeyDown(SDL_SCANCODE_TAB))
+	if (input_isKeyDown(SDL_SCANCODE_1))
 	{
 		meshType = (MeshType)(meshType + 1);
 	}
@@ -94,6 +138,25 @@ void game_update(float delta)
 	if (meshType >= MT_SIZE)
 	{
 		meshType = MT_CUBE;
+	}
+
+	if (input_isKeyDown(SDL_SCANCODE_TAB))
+	{
+		input_toggleGrab();
+	}
+
+	if (input_isGrab())
+	{
+		camera.update(delta);
+	}
+
+	pulseTime += delta * 0.25f;
+
+	if (pulseTime >= 1.0f)
+	{
+		pulseTime = 0.0f;
+		index = index2;
+		index2 = getColorIndex2();
 	}
 }
 
@@ -126,30 +189,19 @@ void game_render()
 
 	prog.bind();
 
-	prog.getUniforms()->setMat4("proj", proj);
-	prog.getUniforms()->setMat4("view", view);
-	prog.getUniforms()->setMat4("model", model);
+	prog.getUniforms()->setMat4("proj", camera.toProjMatrix());
+	prog.getUniforms()->setMat4("view", camera.toViewMatrix());
 
-	texExample.bind(GL_TEXTURE0);
-	cubeMap.bind(GL_TEXTURE1);
-	switch (meshType)
-	{
-	case MT_CUBE:
-		cube.render(prog);
-		break;
-	case MT_SPHERE:
-		sphere.render(prog);
-		break;
-	case MT_CYLINDER:
-		cylinder.render(prog);
-		break;
-	case MT_MONKEY:
-		monkey.render(prog);
-		break;
-	}
+	glm::vec3 color = (1.0f - pulseTime) * colors[index] + pulseTime * colors[index2];
 
-	cubeMap.unbind(GL_TEXTURE1);
-	texExample.unbind(GL_TEXTURE0);
+	prog.getUniforms()->set3f("color", color);
+
+	renderMesh(glm::vec3(0.0f, 0.0f, -5.0f));
+	renderMesh(glm::vec3(0.0f, 0.0f, 5.0f));
+	renderMesh(glm::vec3(0.0f, -5.0f, 0.0f));
+	renderMesh(glm::vec3(0.0f, 5.0f, 0.0f));
+	renderMesh(glm::vec3(-5.0f, 0.0f, 0.0f));
+	renderMesh(glm::vec3(5.0f, 0.0f, 0.0f));
 
 	prog.unbind();
 }
@@ -167,3 +219,48 @@ void game_release()
 	vertex.release();
 }
 
+void renderMesh(const glm::vec3& pos)
+{
+	glm::mat4 model =
+		glm::translate(glm::mat4(1.0f), pos) *
+		//glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
+		glm::rotate(glm::mat4(1.0f), glm::radians(rot), glm::vec3(1.0f, 1.0f, 1.0f));
+
+	prog.getUniforms()->setMat4("model", model);
+	texExample.bind(GL_TEXTURE0);
+	cubeMap.bind(GL_TEXTURE1);
+	switch (meshType)
+	{
+	case MT_CUBE:
+		cube.render(prog);
+		break;
+	case MT_SPHERE:
+		sphere.render(prog);
+		break;
+	case MT_CYLINDER:
+		cylinder.render(prog);
+		break;
+	case MT_MONKEY:
+		monkey.render(prog);
+		break;
+	}
+	cubeMap.unbind(GL_TEXTURE1);
+	texExample.unbind(GL_TEXTURE0);
+}
+
+uint32_t getColorIndex()
+{
+	return rand() % colors.size();
+}
+
+uint32_t getColorIndex2()
+{
+	uint32_t value = getColorIndex();
+
+	if (value == index)
+	{
+		return getColorIndex2();
+	}
+
+	return value;
+}

@@ -292,3 +292,33 @@ public:
 
 	void release();
 };
+
+// Camera
+class Camera
+{
+private:
+	glm::vec3 pos;
+	glm::vec2 rot;
+	float fov = 45.0f;
+	float rotSpeed = 32.0f;
+	float walkSpeed = 32.0f;
+public:
+	void init(const glm::vec3& pos, const glm::vec2& rot);
+
+	void update(float delta);
+
+	glm::mat4 toViewMatrix();
+	glm::mat4 toProjMatrix();
+
+	glm::vec3 getPos();
+	void setPos(const glm::vec3& pos);
+
+	glm::vec2 getRot();
+	void setRot(const glm::vec2& rot);
+
+	float getFOV();
+	void setFOV(float fov);
+
+	float getRotSpeed();
+	void setRotSpeed(float rotSpeed);
+};

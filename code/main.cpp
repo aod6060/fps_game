@@ -14,6 +14,7 @@ static SDL_GLContext g_context = nullptr;
 
 int main(int argc, char** argv)
 {
+	srand(time(nullptr));
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 
