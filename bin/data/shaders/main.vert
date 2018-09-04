@@ -5,14 +5,10 @@
 */
 
 #version 400
-
-
 // Attributes
 layout(location = 0) in vec3 vertices;
 layout(location = 1) in vec2 texCoords;
 layout(location = 2) in vec3 normals;
-
-// K28oIV76Ls8
 
 // Uniform
 uniform mat4 proj;

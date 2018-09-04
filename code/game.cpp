@@ -1,10 +1,9 @@
 #include "game.h"
 
-// Shader
-static Shader vertex;
-static Shader frag;
-// Program
-static Program prog;
+// Program Manager
+static ProgramWrapperMain progMain;
+static ProgramWrapperTerrain progTerrain;
+
 // Texture2D
 static Texture2D texExample;
 static CubeMap cubeMap;
@@ -14,6 +13,9 @@ static Mesh cube;
 static Mesh sphere;
 static Mesh cylinder;
 static Mesh monkey;
+
+// Terrain
+static Terrain terrain;
 
 // Camera
 static Camera camera;
@@ -66,39 +68,8 @@ void game_init()
 {
 	glEnable(GL_DEPTH_TEST);
 
-	// Shaders
-	vertex.create(GL_VERTEX_SHADER, "data/shaders/main.vert");
-	frag.create(GL_FRAGMENT_SHADER, "data/shaders/main.frag");
-
-	// Program
-	prog.addShader(&vertex);
-	prog.addShader(&frag);
-	prog.create();
-	prog.bind();
-
-	// Attributes
-	prog.getAttr()->set("vertices", 0);
-	prog.getAttr()->set("texCoords", 1);
-	prog.getAttr()->set("normals", 2);
-	prog.getAttr()->bind();
-	prog.getAttr()->enable("vertices");
-	prog.getAttr()->enable("texCoords");
-	prog.getAttr()->enable("normals");
-	prog.getAttr()->unbind();
-	prog.getAttr()->disable("vertices");
-	prog.getAttr()->disable("texCoords");
-	prog.getAttr()->disable("normals");
-
-	// Uniforms
-	prog.getUniforms()->create("proj");
-	prog.getUniforms()->create("view");
-	prog.getUniforms()->create("model");
-	prog.getUniforms()->create("tex0");
-	prog.getUniforms()->set1i("tex0", 0);
-	prog.getUniforms()->create("cube0");
-	prog.getUniforms()->set1i("cube0", 1);
-	prog.getUniforms()->create("color");
-	prog.unbind();
+	progMain.init();
+	progTerrain.init();
 
 	// Texture2D
 	texExample.init("data/textures/happyface.png");
@@ -112,6 +83,9 @@ void game_init()
 	cylinder.init("data/meshes/cylender.blend");
 	monkey.init("data/meshes/monkey.blend");
 
+	// Terrain
+	terrain.init("data/terrain/terrain1/terrain1.json");
+
 	// Camera
 	camera.init(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f));
 
@@ -119,6 +93,7 @@ void game_init()
 	index2 = getColorIndex2();
 
 	input_setGrab(true);
+
 
 }
 
@@ -149,13 +124,6 @@ void game_update(float delta)
 	if (input_isGrab())
 	{
 		camera.update(delta);
-
-		/*
-		glm::vec2 mc;
-		input_mousePosition(mc);
-
-		std::cout << mc.x << ", " << mc.y << std::endl;
-		*/
 	}
 	
 
@@ -189,21 +157,29 @@ void game_render()
 		glm::mat4(1.0f);
 
 	glm::mat4 model =
-		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f)) * 
-		//glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
-		glm::rotate(glm::mat4(1.0f), glm::radians(rot), glm::vec3(1.0f, 1.0f, 1.0f));
+		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
 
 	glClearColor(TO_FLOAT_C(0), TO_FLOAT_C(191), TO_FLOAT_C(255), 1.0F);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	prog.bind();
 
-	prog.getUniforms()->setMat4("proj", camera.toProjMatrix());
-	prog.getUniforms()->setMat4("view", camera.toViewMatrix());
+	progTerrain.bind();
+	progTerrain.setProjection(camera.toProjMatrix());
+	progTerrain.setView(camera.toViewMatrix());
+	progTerrain.setModel(model);
+
+	terrain.render(progTerrain);
+
+	progTerrain.unbind();
+
+	progMain.bind();
+
+	progMain.setProjection(camera.toProjMatrix());
+	progMain.setView(camera.toViewMatrix());
 
 	glm::vec3 color = (1.0f - pulseTime) * colors[index] + pulseTime * colors[index2];
 
-	prog.getUniforms()->set3f("color", color);
+	progMain.setColor(color);
 
 	renderMesh(glm::vec3(0.0f, 0.0f, -5.0f));
 	renderMesh(glm::vec3(0.0f, 0.0f, 5.0f));
@@ -212,49 +188,53 @@ void game_render()
 	renderMesh(glm::vec3(-5.0f, 0.0f, 0.0f));
 	renderMesh(glm::vec3(5.0f, 0.0f, 0.0f));
 
-	prog.unbind();
+	progMain.unbind();
 }
 
 void game_release()
 {
+	terrain.release();
+
 	monkey.release();
 	cylinder.release();
 	sphere.release();
 	cube.release();
 	cubeMap.release();
 	texExample.release();
-	prog.release();
-	frag.release();
-	vertex.release();
+	progTerrain.release();
+	progMain.release();
 }
 
 void renderMesh(const glm::vec3& pos)
 {
 	glm::mat4 model =
 		glm::translate(glm::mat4(1.0f), pos) *
-		//glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
 		glm::rotate(glm::mat4(1.0f), glm::radians(rot), glm::vec3(1.0f, 1.0f, 1.0f));
 
-	prog.getUniforms()->setMat4("model", model);
-	texExample.bind(GL_TEXTURE0);
-	cubeMap.bind(GL_TEXTURE1);
+	progMain.setModel(model);
+
+	progMain.bindTex0(texExample);
+	progMain.bindCube0(cubeMap);
+
 	switch (meshType)
 	{
 	case MT_CUBE:
-		cube.render(prog);
+		cube.render(progMain);
 		break;
 	case MT_SPHERE:
-		sphere.render(prog);
+		sphere.render(progMain);
 		break;
 	case MT_CYLINDER:
-		cylinder.render(prog);
+		cylinder.render(progMain);
 		break;
 	case MT_MONKEY:
-		monkey.render(prog);
+		monkey.render(progMain);
 		break;
 	}
-	cubeMap.unbind(GL_TEXTURE1);
-	texExample.unbind(GL_TEXTURE0);
+
+	progMain.unbindCube0(cubeMap);
+	progMain.unbindTex0(texExample);
+
 }
 
 uint32_t getColorIndex()

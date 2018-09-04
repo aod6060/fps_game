@@ -28,6 +28,8 @@
 
 #include <BP/btBulletDynamicsCommon.h>
 
+#include <LUA/lua.hpp>
+
 // Enumerations
 enum InputState
 {
@@ -139,6 +141,8 @@ private:
 	std::map <std::string, uint32_t> attributes;
 public:
 	void set(std::string name, uint32_t id);
+	std::map<std::string, uint32_t>* getAttr();
+
 	void enable(std::string name);
 	void disable(std::string name);
 	void pointer(std::string name, uint32_t size, GLenum type);
@@ -223,6 +227,17 @@ public:
 	uint32_t getID();
 };
 
+class IProgramWrapper
+{
+public:
+	virtual void init() = 0;
+	virtual void bind() = 0;
+	virtual void unbind() = 0;
+	virtual void release() = 0;
+
+	virtual Program* getProgram() = 0;
+};
+
 // Texture2D
 class Texture2D
 {
@@ -230,8 +245,6 @@ private:
 	uint32_t id = 0;
 	uint32_t width = 1;
 	uint32_t height = 1;
-
-	//std::vector<uint32_t> getContents(std::string path, uint32_t& w, uint32_t& h);
 public:
 
 	void init(std::string path);
@@ -274,6 +287,88 @@ public:
 
 };
 
+// ProgramWrapperMain
+class ProgramWrapperMain : public IProgramWrapper
+{
+private:
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+public:
+	virtual void init();
+	virtual void bind();
+	virtual void unbind();
+	virtual void release();
+
+	virtual Program* getProgram();
+
+	void bindAttribute();
+	void unbindAttribute();
+
+	void verticesPointer();
+	void texCoordsPointer();
+	void normalsPointer();
+
+	void drawArrays(GLenum type, uint32_t count);
+	void drawElements(GLenum type, uint32_t count);
+
+	void setProjection(const glm::mat4& m);
+	void setView(const glm::mat4& m);
+	void setModel(const glm::mat4& m);
+
+	void setColor(const glm::vec3& c);
+
+	void bindTex0(Texture2D& tex);
+	void unbindTex0(Texture2D& tex);
+
+	void bindCube0(CubeMap& cube);
+	void unbindCube0(CubeMap& cube);
+};
+
+class ProgramWrapperTerrain : public IProgramWrapper
+{
+private:
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+public:
+
+	virtual void init();
+	virtual void bind();
+	virtual void unbind();
+	virtual void release();
+
+	virtual Program* getProgram();
+
+	void bindAttribute();
+	void unbindAttribute();
+
+	void verticesPointer();
+	void texCoordsPointer();
+
+	void drawArrays(GLenum type, int size);
+	void drawElements(GLenum type, int size);
+
+	void setProjection(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+
+	void setTiling(float tiling);
+
+	void bindBlendMap(Texture2D& blendMap);
+	void bindChannelBlack(Texture2D& channelBlack);
+	void bindChannelRed(Texture2D& channelRed);
+	void bindChannelGreen(Texture2D& channelGreen);
+	void bindChannelBlue(Texture2D& channelBlue);
+
+	void unbindBlendMap(Texture2D& blendMap);
+	void unbindChannelBlack(Texture2D& channelBlack);
+	void unbindChannelRed(Texture2D& channelRed);
+	void unbindChannelGreen(Texture2D& channelGreen);
+	void unbindChannelBlue(Texture2D& channelBlue);
+};
 
 // Meshes
 class Mesh
@@ -289,7 +384,7 @@ public:
 
 	void init(std::string path);
 
-	void render(Program& prog);
+	void render(ProgramWrapperMain& prog);
 
 	void release();
 };
@@ -334,11 +429,35 @@ private:
 
 	IndexBuffer iBuf;
 
+	Texture2D blendMap;
+	Texture2D channelBlack;
+	Texture2D channelRed;
+	Texture2D channelGreen;
+	Texture2D channelBlue;
+
 	std::vector<float> heights;
 
-	float scale = 20.0f;
+	uint32_t width = 1;
+	uint32_t height = 1;
 
+	float scale = 32.0f;
+
+	float tiling = 1.0f;
 
 public:
+
+	void init(std::string path);
+
+	void render(ProgramWrapperTerrain& prog);
+
+	void release();
+
+	void setScale(float scale);
+
+	float getScale();
+
+	void setTiling(float tiling);
+
+	float getTiling();
 
 };

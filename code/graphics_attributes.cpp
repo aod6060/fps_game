@@ -6,6 +6,11 @@ void Attributes::set(std::string name, uint32_t id)
 	this->attributes[name] = id;
 }
 
+std::map<std::string, uint32_t>* Attributes::getAttr()
+{
+	return &this->attributes;
+}
+
 void Attributes::enable(std::string name)
 {
 	glEnableVertexAttribArray(this->attributes[name]);

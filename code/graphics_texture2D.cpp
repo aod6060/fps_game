@@ -38,6 +38,8 @@ void Texture2D::init(std::string path)
 	this->height = FreeImage_GetHeight(bitmap32);
 	GLubyte* textureData = FreeImage_GetBits(bitmap32);
 
+	glGenTextures(1, &id);
+
 	this->bind(GL_TEXTURE0);
 	glTexImage2D(
 		GL_TEXTURE_2D,
@@ -50,8 +52,10 @@ void Texture2D::init(std::string path)
 		GL_UNSIGNED_BYTE,
 		textureData);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	this->unbind(GL_TEXTURE0);
 
@@ -65,13 +69,13 @@ void Texture2D::init(std::string path)
 
 void Texture2D::bind(GLenum type)
 {
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(type);
 	glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void Texture2D::unbind(GLenum type)
 {
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(type);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

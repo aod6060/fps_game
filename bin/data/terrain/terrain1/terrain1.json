@@ -1,0 +1,10 @@
+{
+	"type": "terrain",
+	"version": 1,
+	"height-map": "data/terrain/terrain1/height_map2.png",
+	"blend-map": "data/terrain/terrain1/blend_map2.png",
+	"channel-black": "data/terrain/terrain1/stones_pebble.png",
+	"channel-red": "data/terrain/terrain1/beach_sand.png",
+	"channel-green": "data/terrain/terrain1/grass.png",
+	"channel-blue": "data/terrain/terrain1/thick_grass.png"
+}

@@ -85,27 +85,27 @@ void Mesh::init(std::string path)
 	iBuf.upload();
 }
 
-void Mesh::render(Program& prog)
+void Mesh::render(ProgramWrapperMain& prog)
 {
-	prog.getAttr()->bind();
+	prog.bindAttribute();
 	
 	vBuf.bind();
-	prog.getAttr()->pointer("vertices", 3, GL_FLOAT);
+	prog.verticesPointer();
 	vBuf.unbind();
 
 	tBuf.bind();
-	prog.getAttr()->pointer("texCoords", 2, GL_FLOAT);
+	prog.texCoordsPointer();
 	tBuf.unbind();
 
 	nBuf.bind();
-	prog.getAttr()->pointer("normals", 3, GL_FLOAT);
+	prog.normalsPointer();
 	nBuf.unbind();
 
 	iBuf.bind();
-	glDrawElements(GL_TRIANGLES, iBuf.size(), GL_UNSIGNED_INT, 0);
+	prog.drawElements(GL_TRIANGLES, iBuf.size());
 	iBuf.unbind();
 
-	prog.getAttr()->unbind();
+	prog.unbindAttribute();
 }
 
 void Mesh::release()
