@@ -67,6 +67,64 @@ void Texture2D::init(std::string path)
 	}
 }
 
+void Texture2D::init(void* pixel, int width, int height, GLenum min, GLenum mag)
+{
+	this->width = width;
+	this->height = height;
+
+	glGenTextures(1, &id);
+
+	this->bind(GL_TEXTURE0);
+
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_RGBA,
+		this->width,
+		this->height,
+		0,
+		GL_RGBA,
+		GL_UNSIGNED_BYTE,
+		pixel);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
+
+	//glGenerateMipmap(GL_TEXTURE_2D);
+
+	this->unbind(GL_TEXTURE0);
+}
+
+void Texture2D::init(
+	int width, 
+	int height, 
+	GLenum min, 
+	GLenum mag)
+{
+	this->width = width;
+	this->height = height;
+
+	glGenTextures(1, &id);
+
+	this->bind(GL_TEXTURE0);
+
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_RGBA,
+		this->width,
+		this->height,
+		0,
+		GL_RGBA,
+		GL_UNSIGNED_BYTE,
+		nullptr);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
+
+	this->unbind(GL_TEXTURE0);
+}
+
 void Texture2D::bind(GLenum type)
 {
 	glActiveTexture(type);

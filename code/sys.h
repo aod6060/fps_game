@@ -249,6 +249,10 @@ public:
 
 	void init(std::string path);
 
+	void init(void* pixel, int width, int height, GLenum min = GL_NEAREST, GLenum mag = GL_NEAREST);
+
+	void init(int width, int height, GLenum min = GL_NEAREST, GLenum mag = GL_NEAREST);
+	
 	void bind(GLenum type);
 
 	void unbind(GLenum type);
@@ -287,87 +291,48 @@ public:
 
 };
 
-// ProgramWrapperMain
-class ProgramWrapperMain : public IProgramWrapper
+class RenderBuffer
 {
 private:
-	Shader vertex;
-	Shader fragment;
-
-	Program program;
+	uint32_t id = 0;
+	uint32_t width = 1;
+	uint32_t height = 1;
 public:
-	virtual void init();
-	virtual void bind();
-	virtual void unbind();
-	virtual void release();
+	void init(uint32_t width, uint32_t height);
 
-	virtual Program* getProgram();
+	uint32_t getID();
 
-	void bindAttribute();
-	void unbindAttribute();
+	uint32_t getWidth();
+	uint32_t getHeight();
 
-	void verticesPointer();
-	void texCoordsPointer();
-	void normalsPointer();
+	void bind();
 
-	void drawArrays(GLenum type, uint32_t count);
-	void drawElements(GLenum type, uint32_t count);
+	void unbind();
 
-	void setProjection(const glm::mat4& m);
-	void setView(const glm::mat4& m);
-	void setModel(const glm::mat4& m);
-
-	void setColor(const glm::vec3& c);
-
-	void bindTex0(Texture2D& tex);
-	void unbindTex0(Texture2D& tex);
-
-	void bindCube0(CubeMap& cube);
-	void unbindCube0(CubeMap& cube);
+	void release();
 };
 
-class ProgramWrapperTerrain : public IProgramWrapper
+class Framebuffer
 {
 private:
-	Shader vertex;
-	Shader fragment;
+	uint32_t id = 0;
 
-	Program program;
+
 public:
 
-	virtual void init();
-	virtual void bind();
-	virtual void unbind();
-	virtual void release();
+	void init();
 
-	virtual Program* getProgram();
+	void bind();
 
-	void bindAttribute();
-	void unbindAttribute();
+	void unbind();
 
-	void verticesPointer();
-	void texCoordsPointer();
+	void release();
 
-	void drawArrays(GLenum type, int size);
-	void drawElements(GLenum type, int size);
+	void checkErrors();
 
-	void setProjection(const glm::mat4& proj);
-	void setView(const glm::mat4& view);
-	void setModel(const glm::mat4& model);
+	void addTexture(GLenum attach, GLenum texType, Texture2D& texture);
 
-	void setTiling(float tiling);
-
-	void bindBlendMap(Texture2D& blendMap);
-	void bindChannelBlack(Texture2D& channelBlack);
-	void bindChannelRed(Texture2D& channelRed);
-	void bindChannelGreen(Texture2D& channelGreen);
-	void bindChannelBlue(Texture2D& channelBlue);
-
-	void unbindBlendMap(Texture2D& blendMap);
-	void unbindChannelBlack(Texture2D& channelBlack);
-	void unbindChannelRed(Texture2D& channelRed);
-	void unbindChannelGreen(Texture2D& channelGreen);
-	void unbindChannelBlue(Texture2D& channelBlue);
+	void addRenderBuffer(GLenum attach, RenderBuffer& renderBuffer);
 };
 
 // Meshes
@@ -384,9 +349,16 @@ public:
 
 	void init(std::string path);
 
-	void render(ProgramWrapperMain& prog);
+	//void render(ProgramWrapperMain& prog);
 
 	void release();
+
+	VertexBuffer* getVertexBuffer();
+	VertexBuffer* getTexCoordBuffer();
+	VertexBuffer* getNormalBuffer();
+
+	IndexBuffer* getIndexBuffer();
+
 };
 
 // Camera
@@ -448,7 +420,7 @@ public:
 
 	void init(std::string path);
 
-	void render(ProgramWrapperTerrain& prog);
+	//void render(ProgramWrapperTerrain& prog);
 
 	void release();
 
@@ -459,5 +431,245 @@ public:
 	void setTiling(float tiling);
 
 	float getTiling();
+
+	Texture2D* getBlendMap();
+	Texture2D* getChannelBlack();
+	Texture2D* getChannelRed();
+	Texture2D* getChannelGreen();
+	Texture2D* getChannelBlue();
+
+	VertexBuffer* getVertexBuffer();
+	VertexBuffer* getTexCoordBuffer();
+	VertexBuffer* getNormalBuffer();
+
+	IndexBuffer* getIndexBuffer();
+
+};
+
+// Terrain Data
+struct TerrainData
+{
+	// Terrain Data
+	float size = 512.0f;
+
+	// Height Map Generation
+	float seed = 0.0f;
+
+	float hm_wave1 = 128.0f;
+	float hm_weight1 = 0.5f;
+
+	float hm_wave2 = 64.0f;
+	float hm_weight2 = 0.35f;
+
+	float hm_wave3 = 16.0f;
+	float hm_weight3 = 0.15f;
+
+	std::vector<float> elevation;
+	std::vector<float> mask;
+	std::vector<float> maskedElevation;
+	std::vector<glm::vec2> moister;
+	std::vector<glm::vec3> blend;
+	std::vector<glm::vec3> biomes;
+
+	SDL_Surface* elevationSurf = nullptr;
+	SDL_Surface* maskSurf = nullptr;
+	SDL_Surface* maskedElevationSurf = nullptr;
+	SDL_Surface* moisterSurface = nullptr;
+	SDL_Surface* blendSurf = nullptr;
+	SDL_Surface* biomesSurf = nullptr;
+
+	Texture2D elevationTex;
+	Texture2D maskTex;
+	Texture2D maskedElevationTex;
+	Texture2D moisterTex;
+	Texture2D blendMap;
+	Texture2D biomesMap;
+
+	void init();
+
+	void release();
+
+	float toMask(float x, float y, float radius);
+
+};
+
+// Terrain Procedurally Generated Terrain
+class TerrainProcedural
+{
+private:
+	TerrainData data;
+
+	Texture2D blendMap;
+
+	Texture2D channelBlack;
+	Texture2D channelRed;
+	Texture2D channelGreen;
+	Texture2D channelBlue;
+
+	VertexBuffer vBuf;
+	VertexBuffer tBuf;
+	VertexBuffer nBuf;
+
+	IndexBuffer iBuf;
+
+	float scale = 32.0f;
+	float tiling = 1.0f;
+
+public:
+
+	void init();
+
+	//void render(ProgramWrapperTerrain& prog);
+
+	void release();
+
+	void setScale(float scale);
+
+	float getScale();
+
+	void setTiling(float tiling);
+
+	float getTiling();
+
+	TerrainData* getData();
+
+	Texture2D* getBlendMap();
+	Texture2D* getChannelBlack();
+	Texture2D* getChannelRed();
+	Texture2D* getChannelGreen();
+	Texture2D* getChannelBlue();
+
+	VertexBuffer* getVertexBuffer();
+	VertexBuffer* getTexCoordBuffer();
+	VertexBuffer* getNormalBuffer();
+
+	IndexBuffer* getIndexBuffer();
+
+};
+
+// ProgramWrapperMain
+class ProgramWrapperMain : public IProgramWrapper
+{
+private:
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+public:
+	virtual void init();
+	virtual void bind();
+	virtual void unbind();
+	virtual void release();
+
+	virtual Program* getProgram();
+
+	void bindAttribute();
+	void unbindAttribute();
+
+	void verticesPointer();
+	void texCoordsPointer();
+	void normalsPointer();
+
+	void drawArrays(GLenum type, uint32_t count);
+	void drawElements(GLenum type, uint32_t count);
+
+	void setProjection(const glm::mat4& m);
+	void setView(const glm::mat4& m);
+	void setModel(const glm::mat4& m);
+
+	void bindTex0(Texture2D& tex);
+	void unbindTex0(Texture2D& tex);
+
+	void drawMesh(Mesh& mesh, Texture2D& texture);
+};
+
+class ProgramWrapperTerrain : public IProgramWrapper
+{
+private:
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+public:
+
+	virtual void init();
+	virtual void bind();
+	virtual void unbind();
+	virtual void release();
+
+	virtual Program* getProgram();
+
+	void bindAttribute();
+	void unbindAttribute();
+
+	void verticesPointer();
+	void texCoordsPointer();
+
+	void drawArrays(GLenum type, int size);
+	void drawElements(GLenum type, int size);
+
+	void setProjection(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+
+	void setTiling(float tiling);
+
+	void bindBlendMap(Texture2D& blendMap);
+	void bindChannelBlack(Texture2D& channelBlack);
+	void bindChannelRed(Texture2D& channelRed);
+	void bindChannelGreen(Texture2D& channelGreen);
+	void bindChannelBlue(Texture2D& channelBlue);
+
+	void unbindBlendMap(Texture2D& blendMap);
+	void unbindChannelBlack(Texture2D& channelBlack);
+	void unbindChannelRed(Texture2D& channelRed);
+	void unbindChannelGreen(Texture2D& channelGreen);
+	void unbindChannelBlue(Texture2D& channelBlue);
+
+	void drawTerrain(Terrain& terrain);
+	void drawTerrain(TerrainProcedural& terrain);
+};
+
+class ProgramWrapperBlur : public IProgramWrapper
+{
+private:
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+public:
+
+	virtual void init();
+	virtual void bind();
+	virtual void unbind();
+	virtual void release();
+
+	virtual Program* getProgram();
+
+	void bindAttribute();
+	void unbindAttribute();
+
+	void verticesPointer();
+	void texCoordsPointer();
+
+	void drawArrays(GLenum type, int size);
+	void drawElements(GLenum type, int size);
+
+	void setProjection(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+
+	void setSize(float size);
+
+	void bindInputTex(Texture2D& tex);
+	void unbindInputTex(Texture2D& tex);
+
+	void drawMesh(Mesh& mesh, Texture2D& tex);
+
+	void drawBuffer(
+		VertexBuffer& vBuf, 
+		VertexBuffer& tBuf, 
+		IndexBuffer& iBuf,
+		Texture2D& tex);
 
 };

@@ -85,29 +85,6 @@ void Mesh::init(std::string path)
 	iBuf.upload();
 }
 
-void Mesh::render(ProgramWrapperMain& prog)
-{
-	prog.bindAttribute();
-	
-	vBuf.bind();
-	prog.verticesPointer();
-	vBuf.unbind();
-
-	tBuf.bind();
-	prog.texCoordsPointer();
-	tBuf.unbind();
-
-	nBuf.bind();
-	prog.normalsPointer();
-	nBuf.unbind();
-
-	iBuf.bind();
-	prog.drawElements(GL_TRIANGLES, iBuf.size());
-	iBuf.unbind();
-
-	prog.unbindAttribute();
-}
-
 void Mesh::release()
 {
 	iBuf.release();
@@ -115,3 +92,24 @@ void Mesh::release()
 	tBuf.release();
 	vBuf.release();
 }
+
+VertexBuffer* Mesh::getVertexBuffer()
+{
+	return &this->vBuf;
+}
+
+VertexBuffer* Mesh::getTexCoordBuffer()
+{
+	return &this->tBuf;
+}
+
+VertexBuffer* Mesh::getNormalBuffer()
+{
+	return &this->nBuf;
+}
+
+IndexBuffer* Mesh::getIndexBuffer()
+{
+	return &this->iBuf;
+}
+

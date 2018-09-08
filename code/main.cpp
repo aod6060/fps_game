@@ -5,8 +5,8 @@
 #define G_TIME 1.0f / 60.0f
 
 static std::string g_cap = "FPS Test";
-static uint32_t g_width = 800;
-static uint32_t g_height = 600;
+static uint32_t g_width = 1280;
+static uint32_t g_height = 768;
 static bool g_running = true;
 
 static SDL_Window* g_win = nullptr;

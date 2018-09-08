@@ -168,3 +168,70 @@ void ProgramWrapperTerrain::unbindChannelBlue(Texture2D& channelBlue)
 	channelBlue.unbind(GL_TEXTURE4);
 }
 
+void ProgramWrapperTerrain::drawTerrain(Terrain& terrain)
+{
+	this->setTiling(terrain.getTiling());
+
+	this->bindBlendMap(*terrain.getBlendMap());
+	this->bindChannelBlack(*terrain.getChannelBlack());
+	this->bindChannelRed(*terrain.getChannelRed());
+	this->bindChannelGreen(*terrain.getChannelGreen());
+	this->bindChannelBlue(*terrain.getChannelBlue());
+
+	this->bindAttribute();
+
+	terrain.getVertexBuffer()->bind();
+	this->verticesPointer();
+	terrain.getVertexBuffer()->unbind();
+
+	terrain.getTexCoordBuffer()->bind();
+	this->texCoordsPointer();
+	terrain.getTexCoordBuffer()->unbind();
+
+	terrain.getIndexBuffer()->bind();
+	this->drawElements(GL_TRIANGLES, terrain.getIndexBuffer()->size());
+	terrain.getIndexBuffer()->unbind();
+
+	this->unbindAttribute();
+
+	this->unbindBlendMap(*terrain.getBlendMap());
+	this->unbindChannelBlack(*terrain.getChannelBlack());
+	this->unbindChannelRed(*terrain.getChannelRed());
+	this->unbindChannelGreen(*terrain.getChannelGreen());
+	this->unbindChannelBlue(*terrain.getChannelBlue());
+}
+
+void ProgramWrapperTerrain::drawTerrain(TerrainProcedural& terrain)
+{
+	this->setTiling(terrain.getTiling());
+
+	this->bindBlendMap(*terrain.getBlendMap());
+	this->bindChannelBlack(*terrain.getChannelBlack());
+	this->bindChannelRed(*terrain.getChannelRed());
+	this->bindChannelGreen(*terrain.getChannelGreen());
+	this->bindChannelBlue(*terrain.getChannelBlue());
+
+
+	this->bindAttribute();
+
+	terrain.getVertexBuffer()->bind();
+	this->verticesPointer();
+	terrain.getVertexBuffer()->unbind();
+
+	terrain.getTexCoordBuffer()->bind();
+	this->texCoordsPointer();
+	terrain.getTexCoordBuffer()->unbind();
+
+	terrain.getIndexBuffer()->bind();
+	this->drawElements(GL_TRIANGLES, terrain.getIndexBuffer()->size());
+	terrain.getIndexBuffer()->unbind();
+
+	this->unbindAttribute();
+
+	this->unbindBlendMap(*terrain.getBlendMap());
+	this->unbindChannelBlack(*terrain.getChannelBlack());
+	this->unbindChannelRed(*terrain.getChannelRed());
+	this->unbindChannelGreen(*terrain.getChannelGreen());
+	this->unbindChannelBlue(*terrain.getChannelBlue());
+
+}

@@ -91,15 +91,15 @@ void Terrain::init(std::string path)
 		this->channelBlue.init(path);
 
 		// Create Vertex Buffer
-		for (uint32_t y = 0; y < height; y++)
+		for (int32_t y = 0; y < height; y++)
 		{
-			for (uint32_t x = 0; x < width; x++)
+			for (int32_t x = 0; x < width; x++)
 			{
 				// Vertices
 				glm::vec3 v;
-				v.x = x;
+				v.x = x - (float)(this->width / 2);
 				v.y = heights[y * width + x] * this->scale;
-				v.z = y;
+				v.z = y - (float)(this->height / 2);
 				vBuf.add(v);
 				// TexCoords
 				glm::vec2 tv;
@@ -140,47 +140,15 @@ void Terrain::init(std::string path)
 		std::cout << "Error: either the file format is wrong version, wrong type, or file not found..." << std::endl;
 	}
 
-	this->setTiling(32.0f);
-}
-
-void Terrain::render(ProgramWrapperTerrain& prog)
-{
-	prog.setTiling(this->tiling);
-
-
-	prog.bindBlendMap(this->blendMap);
-	prog.bindChannelBlack(this->channelBlack);
-	prog.bindChannelRed(this->channelRed);
-	prog.bindChannelGreen(this->channelGreen);
-	prog.bindChannelBlue(this->channelBlue);
-
-	prog.bindAttribute();
-
-	vBuf.bind();
-	prog.verticesPointer();
-	vBuf.unbind();
-
-	tBuf.bind();
-	prog.texCoordsPointer();
-	tBuf.unbind();
-
-	iBuf.bind();
-	prog.drawElements(GL_TRIANGLES, iBuf.size());
-	iBuf.unbind();
-
-	prog.unbindAttribute();
-
-	prog.unbindBlendMap(this->blendMap);
-	prog.unbindChannelBlack(this->channelBlack);
-	prog.unbindChannelRed(this->channelRed);
-	prog.unbindChannelGreen(this->channelGreen);
-	prog.unbindChannelBlue(this->channelBlue);
+	this->setTiling(64.0f);
 }
 
 void Terrain::release()
 {
 	iBuf.release();
 	vBuf.release();
+	tBuf.release();
+	nBuf.release();
 	channelBlue.release();
 	channelGreen.release();
 	channelRed.release();
@@ -206,4 +174,49 @@ void Terrain::setTiling(float tiling)
 float Terrain::getTiling()
 {
 	return this->tiling;
+}
+
+Texture2D* Terrain::getBlendMap()
+{
+	return &this->blendMap;
+}
+
+Texture2D* Terrain::getChannelBlack()
+{
+	return &this->channelBlack;
+}
+
+Texture2D* Terrain::getChannelRed()
+{
+	return &this->channelRed;
+}
+
+Texture2D* Terrain::getChannelGreen()
+{
+	return &this->channelGreen;
+}
+
+Texture2D* Terrain::getChannelBlue()
+{
+	return &this->channelBlue;
+}
+
+VertexBuffer* Terrain::getVertexBuffer()
+{
+	return &this->vBuf;
+}
+
+VertexBuffer* Terrain::getTexCoordBuffer()
+{
+	return &this->tBuf;
+}
+
+VertexBuffer* Terrain::getNormalBuffer()
+{
+	return &this->nBuf;
+}
+
+IndexBuffer* Terrain::getIndexBuffer()
+{
+	return &this->iBuf;
 }

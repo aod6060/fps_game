@@ -97,7 +97,7 @@ glm::mat4 Camera::toProjMatrix()
 	return glm::perspective(
 		glm::radians(this->fov),
 		(float)app_getWidth() / (float)app_getHeight(),
-		1.0f,
+		0.1f,
 		1024.0f
 	);
 }

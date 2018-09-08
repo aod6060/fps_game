@@ -29,9 +29,6 @@ void ProgramWrapperMain::init()
 	program.getUniforms()->create("model");
 	program.getUniforms()->create("tex0");
 	program.getUniforms()->set1i("tex0", 0);
-	program.getUniforms()->create("cube0");
-	program.getUniforms()->set1i("cube0", 1);
-	program.getUniforms()->create("color");
 	program.unbind();
 }
 
@@ -107,11 +104,6 @@ void ProgramWrapperMain::setModel(const glm::mat4& m)
 	program.getUniforms()->setMat4("model", m);
 }
 
-void ProgramWrapperMain::setColor(const glm::vec3& c)
-{
-	program.getUniforms()->set3f("color", c);
-}
-
 void ProgramWrapperMain::bindTex0(Texture2D& tex)
 {
 	tex.bind(GL_TEXTURE0);
@@ -122,12 +114,29 @@ void ProgramWrapperMain::unbindTex0(Texture2D& tex)
 	tex.unbind(GL_TEXTURE0);
 }
 
-void ProgramWrapperMain::bindCube0(CubeMap& cube)
+void ProgramWrapperMain::drawMesh(Mesh& mesh, Texture2D& texture)
 {
-	cube.bind(GL_TEXTURE1);
-}
+	this->bindTex0(texture);
 
-void ProgramWrapperMain::unbindCube0(CubeMap& cube)
-{
-	cube.unbind(GL_TEXTURE1);
+	this->bindAttribute();
+
+	mesh.getVertexBuffer()->bind();
+	this->verticesPointer();
+	mesh.getVertexBuffer()->unbind();
+
+	mesh.getTexCoordBuffer()->bind();
+	this->texCoordsPointer();
+	mesh.getTexCoordBuffer()->unbind();
+
+	mesh.getNormalBuffer()->bind();
+	this->normalsPointer();
+	mesh.getNormalBuffer()->unbind();
+
+	mesh.getIndexBuffer()->bind();
+	this->drawElements(GL_TRIANGLES, mesh.getIndexBuffer()->size());
+	mesh.getIndexBuffer()->unbind();
+
+	this->unbindAttribute();
+
+	this->unbindTex0(texture);
 }
