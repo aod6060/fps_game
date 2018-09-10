@@ -15,7 +15,7 @@ void BillboardManager::addBillboard(glm::vec3 pos, glm::vec2 scale, uint32_t tex
 	this->billboards.push_back({ pos, scale, tex });
 }
 
-float _toAngle(const glm::vec3& a, const glm::vec3& b)
+static float _toAngle(const glm::vec3& a, const glm::vec3& b)
 {
 	float la = glm::length(a);
 	float lb = glm::length(b);

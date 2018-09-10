@@ -4,7 +4,8 @@
 static ProgramWrapperMain progMain;
 static ProgramWrapperTerrain progTerrain;
 
-static BillboardManager billboardManager;
+//static BillboardManager billboardManager;
+static BillboardManagerTest billboardManager;
 
 // Terrain
 //static Terrain terrain;
@@ -58,7 +59,7 @@ void game_init()
 
 	int i = 0;
 
-	while(i < 4096)
+	while(i < 256)
 	{
 		int32_t size = terrain.getData()->size;
 

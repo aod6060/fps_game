@@ -4,6 +4,8 @@
 void TerrainData::init()
 {
 	this->seed = rand() % UINT_MAX;
+	uint32_t r = rand() % 4;
+	std::cout << "r=" << r << std::endl;
 
 	// Resizing Maps
 	this->elevation.resize(this->size * this->size);
@@ -44,7 +46,7 @@ void TerrainData::init()
 			);
 
 			// Island Mask
-			float m = this->toMask(x, y, 10.0f);
+			float m = this->toMask(x, y, 10.0f, r);
 			mask[i] = m;
 
 			// Masked Elevation
@@ -76,11 +78,11 @@ void TerrainData::init()
 				{
 					this->blend[i] = glm::vec3(1.0f, 0.0f, 0.0f);
 				}
-				else if (t >= 0.35 && t < 0.45)
+				else if (t >= 0.35 && t < 0.5f)
 				{
 					this->blend[i] = glm::vec3(0.0f, 1.0f, 0.0f);
 				}
-				else if (t >= 0.45) {
+				else if (t >= 0.5f) {
 					this->blend[i] = glm::vec3(0.0f, 0.0f, 1.0f);
 				}
 			}
@@ -100,12 +102,12 @@ void TerrainData::init()
 					this->biomes[i] = glm::vec3(194 / 256.0f, 178 / 256.0f, 128 / 256.0f);
 					this->terrainType[i] = TT_BEACH;
 				}
-				else if (t >= 0.35 && t < 0.45)
+				else if (t >= 0.35 && t < 0.5)
 				{
 					this->biomes[i] = glm::vec3(0.3f, 1.0f, 0.3f);
 					this->terrainType[i] = TT_GRASS;
 				}
-				else if (t >= 0.45)
+				else if (t >= 0.5)
 				{
 					this->biomes[i] = glm::vec3(139 / 256.0f, 69 / 256.0f, 19 / 256.0f);
 					this->terrainType[i] = TT_SNOW;
@@ -216,15 +218,71 @@ void TerrainData::release()
 	SDL_FreeSurface(this->elevationSurf);
 }
 
-float TerrainData::toMask(float x, float y, float radius)
+float TerrainData::toMask(float x, float y, float radius, uint32_t r)
 {
-	float distX = fabs(x - size * 0.5f);
-	float distY = fabs(y - size * 0.5f);
-	float dist = sqrt(distX * distX + distY * distY);
 
-	float max_width = size * 0.5f - radius;
-	float delta = dist / max_width;
-	float gradient = delta * delta;
+	// 1 spuare, 0 circle...
 
-	return fmax(0.0f, 1.0f - gradient);
+	
+	if (r == 1)
+	{
+		float distX = fabs(x - size * 0.5f);
+		float distY = fabs(y - size * 0.5f);
+		float dist = fmax(distX, distY);
+
+		float max_width = size * 0.5f - radius;
+		float delta = dist / max_width;
+		float gradient = delta * delta;
+
+		return fmax(0.0f, 1.0f - gradient);
+	}
+	else if (r == 2)
+	{
+		float distX = fabs(x - size * 0.5f);
+		float distY = fabs(y - size * 0.5f);
+		float dist = sqrt(distX * distX + distY * distY);
+
+		float max_width = size * 0.5f - radius;
+		float max_width2 = size * 0.5f - (radius * 11.65);
+
+		float delta = dist / max_width;
+		float delta2 = dist / max_width2;
+
+		float gradient = delta * delta;
+		float grad2 = delta2 * delta2;
+
+		float g3 = (1.0f - gradient) * grad2;
+
+		return glm::clamp(g3, 0.0f, 1.0f);
+	}
+	else if (r == 3)
+	{
+		float distX = fabs(x - size * 0.5f);
+		float distY = fabs(y - size * 0.5f);
+		float dist = fmax(distX, distY);
+
+		float max_width = size * 0.5f - radius;
+		float max_width2 = size * 0.5f - (radius * 11.65);
+
+		float delta = dist / max_width;
+		float delta2 = dist / max_width2;
+
+		float gradient = delta * delta;
+		float grad2 = delta2 * delta2;
+
+		float g3 = (1.0f - gradient) * grad2;
+
+		return glm::clamp(g3, 0.0f, 1.0f);
+	}
+	else {
+		float distX = fabs(x - size * 0.5f);
+		float distY = fabs(y - size * 0.5f);
+		float dist = sqrt(distX * distX + distY * distY);
+
+		float max_width = size * 0.5f - radius;
+		float delta = dist / max_width;
+		float gradient = delta * delta;
+
+		return fmax(0.0f, 1.0f - gradient);
+	}
 }

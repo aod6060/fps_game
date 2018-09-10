@@ -96,10 +96,12 @@ public:
 	void add(const glm::vec3& v);
 	void add(float x, float y, float z, float w);
 	void add(const glm::vec4& v);
+	void add(const glm::mat4& m);
 	void addAll(std::vector<float>& v);
 	void addAll(std::vector<glm::vec2>& v);
 	void addAll(std::vector<glm::vec3>& v);
 	void addAll(std::vector<glm::vec4>& v);
+	void addAll(std::vector<glm::mat4>& m);
 	void clear();
 	void create();
 	void upload();
@@ -144,8 +146,13 @@ public:
 	std::map<std::string, uint32_t>* getAttr();
 
 	void enable(std::string name);
+	void enable(std::string name, uint32_t index);
 	void disable(std::string name);
+	void disable(std::string name, uint32_t index);
+
 	void pointer(std::string name, uint32_t size, GLenum type);
+	void pointer(std::string name, uint32_t index, uint32_t size, GLenum type, uint32_t offset, const void* pointer);
+	void divisor(std::string name, uint32_t index, uint32_t divisor);
 	void create();
 	void bind();
 	void unbind();
@@ -498,7 +505,7 @@ struct TerrainData
 
 	void release();
 
-	float toMask(float x, float y, float radius);
+	float toMask(float x, float y, float radius, uint32_t r);
 
 };
 
@@ -737,7 +744,10 @@ public:
 
 	void init();
 
-	void addBillboard(glm::vec3 pos, glm::vec2 scale, uint32_t tex);
+	void addBillboard(
+		glm::vec3 pos, 
+		glm::vec2 scale, 
+		uint32_t tex);
 
 	void render(
 		const glm::mat4& proj, 
@@ -745,6 +755,65 @@ public:
 		const glm::vec3& cameraPos);
 
 	void release();
+
+	uint32_t maxTreeSize = 4;
+};
+
+struct BillboardTest
+{
+	glm::vec3 pos;
+	glm::vec2 scale;
+};
+
+class BillboardManagerTest
+{
+private:
+
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+
+	Texture2D tree;
+	Texture2D tree2;
+	Texture2D tree3;
+	Texture2D tree4;
+
+	std::vector<BillboardTest> tree_b;
+	std::vector<BillboardTest> tree_b2;
+	std::vector<BillboardTest> tree_b3;
+	std::vector<BillboardTest> tree_b4;
+
+	// Buffers
+	VertexBuffer vBuf;
+	VertexBuffer tBuf;
+	IndexBuffer iBuf;
+
+	// Instance Arrays
+	VertexBuffer matrixBuffer;
+
+	void render(Texture2D& tex, uint32_t size);
+
+	void convertBillboardToMatrix(
+		std::vector<glm::mat4>& ms, 
+		std::vector<BillboardTest>& bs, 
+		glm::vec3 cameraPos);
+public:
+
+	void init();
+
+	void release();
+
+	void addBillboard(
+		glm::vec3 pos,
+		glm::vec2 scale,
+		uint32_t tex
+	);
+
+	void render(
+		const glm::mat4& proj,
+		const glm::mat4& view,
+		const glm::vec3& cameraPos);
 
 	uint32_t maxTreeSize = 4;
 };

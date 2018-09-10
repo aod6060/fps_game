@@ -16,9 +16,19 @@ void Attributes::enable(std::string name)
 	glEnableVertexAttribArray(this->attributes[name]);
 }
 
+void Attributes::enable(std::string name, uint32_t index)
+{
+	glEnableVertexAttribArray(this->attributes[name] + index);
+}
+
 void Attributes::disable(std::string name)
 {
 	glDisableVertexAttribArray(this->attributes[name]);
+}
+
+void Attributes::disable(std::string name, uint32_t index)
+{
+	glEnableVertexAttribArray(this->attributes[name] + index);
 }
 
 void Attributes::pointer(
@@ -35,6 +45,31 @@ void Attributes::pointer(
 		GL_FALSE, 
 		0, 
 		0);
+}
+
+void Attributes::pointer(
+	std::string name,
+	uint32_t index,
+	uint32_t size,
+	GLenum type,
+	uint32_t offset,
+	const void* pointer)
+{
+	glVertexAttribPointer(
+		attributes[name] + index,
+		size,
+		type,
+		GL_FALSE,
+		offset,
+		pointer);
+}
+
+void Attributes::divisor(
+	std::string name, 
+	uint32_t index,
+	uint32_t divisor)
+{
+	glVertexAttribDivisor(this->attributes[name] + index, divisor);
 }
 
 void Attributes::create()
