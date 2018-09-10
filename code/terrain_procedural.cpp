@@ -52,10 +52,10 @@ void TerrainProcedural::init()
 
 	this->setTiling(32.0f);
 
-	channelBlack.init("data/terrain/terrain1/stones_pebble.png");
-	channelRed.init("data/terrain/terrain1/beach_sand.png");
-	channelGreen.init("data/terrain/terrain1/grass.png");
-	channelBlue.init("data/textures/prop/snow_3.png");
+	channelBlack.init("data/textures/prop/ocean.png");
+	channelRed.init("data/textures/prop/beach_sand2.png");
+	channelGreen.init("data/textures/prop/grass.png");
+	channelBlue.init("data/textures/prop/dirt_2.png");
 
 
 	// Blur BlendMap
@@ -179,6 +179,36 @@ void TerrainProcedural::setTiling(float tiling)
 float TerrainProcedural::getTiling()
 {
 	return this->tiling;
+}
+
+TerrainType TerrainProcedural::getTerrainType(float x, float z)
+{
+	uint32_t _x = x + (data.size / 2);
+	uint32_t _y = z + (data.size / 2);
+
+	if (_y > data.size - 1 && _x > data.size - 1) 
+	{
+		return TT_OCEAN;
+	}
+	else
+	{
+		return data.terrainType[_y * data.size + _x];
+	}
+}
+
+float TerrainProcedural::getHeight(float x, float z)
+{
+	uint32_t _x = x + (data.size / 2);
+	uint32_t _y = z + (data.size / 2);
+
+	if (_y > data.size - 1 && _x > data.size - 1)
+	{
+		return 0.0f;
+	}
+	else
+	{
+		return data.maskedElevation[_y * data.size + _x] * this->scale;
+	}
 }
 
 TerrainData* TerrainProcedural::getData()

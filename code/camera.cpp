@@ -15,6 +15,7 @@ void Camera::update(float delta)
 
 	input_mousePosition(mc);
 
+
 	rot.y += this->rotSpeed * mc.x * ((delta - 0.001f < 0) ? 0.001f : delta);
 	rot.x += this->rotSpeed * mc.y * ((delta - 0.001f < 0) ? 0.001f : delta);
 
@@ -97,7 +98,7 @@ glm::mat4 Camera::toProjMatrix()
 	return glm::perspective(
 		glm::radians(this->fov),
 		(float)app_getWidth() / (float)app_getHeight(),
-		0.1f,
+		1.0f,
 		1024.0f
 	);
 }

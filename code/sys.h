@@ -446,6 +446,14 @@ public:
 
 };
 
+enum TerrainType
+{
+	TT_OCEAN = 0,
+	TT_BEACH,
+	TT_GRASS,
+	TT_SNOW
+};
+
 // Terrain Data
 struct TerrainData
 {
@@ -470,6 +478,7 @@ struct TerrainData
 	std::vector<glm::vec2> moister;
 	std::vector<glm::vec3> blend;
 	std::vector<glm::vec3> biomes;
+	std::vector<TerrainType> terrainType;
 
 	SDL_Surface* elevationSurf = nullptr;
 	SDL_Surface* maskSurf = nullptr;
@@ -514,7 +523,6 @@ private:
 
 	float scale = 32.0f;
 	float tiling = 1.0f;
-
 public:
 
 	void init();
@@ -531,6 +539,10 @@ public:
 
 	float getTiling();
 
+	TerrainType getTerrainType(float x, float z);
+	float getHeight(float x, float z);
+
+
 	TerrainData* getData();
 
 	Texture2D* getBlendMap();
@@ -544,7 +556,6 @@ public:
 	VertexBuffer* getNormalBuffer();
 
 	IndexBuffer* getIndexBuffer();
-
 };
 
 // ProgramWrapperMain
@@ -672,4 +683,68 @@ public:
 		IndexBuffer& iBuf,
 		Texture2D& tex);
 
+};
+
+class ProgramWrapperBillboard : public IProgramWrapper
+{
+private:
+	Shader vertex;
+	Shader fragment;
+	Program program;
+	VertexBuffer vBuf;
+	VertexBuffer tBuf;
+	IndexBuffer iBuf;
+public:
+	virtual void init();
+	virtual void bind();
+	virtual void unbind();
+	virtual void release();
+	virtual Program* getProgram();
+	void bindAttribute();
+	void unbindAttribute();
+	void verticesPointer();
+	void texCoordsPointer();
+	void drawElements(GLenum type, int size);
+	void setProjection(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+	void setCameraPos(const glm::vec3& cameraPos);
+	void bindBillboard(Texture2D& billboard);
+	void unbindBillboard(Texture2D& billboard);
+	void draw(Texture2D& tex);
+};
+
+struct Billboard
+{
+	glm::vec3 pos;
+	glm::vec2 scale;
+	uint32_t t = 0;
+};
+
+class BillboardManager
+{
+private:
+	ProgramWrapperBillboard prog;
+
+	std::vector<Billboard> billboards;
+
+	Texture2D tree;
+	Texture2D tree2;
+	Texture2D tree3;
+	Texture2D tree4;
+
+public:
+
+	void init();
+
+	void addBillboard(glm::vec3 pos, glm::vec2 scale, uint32_t tex);
+
+	void render(
+		const glm::mat4& proj, 
+		const glm::mat4& view,
+		const glm::vec3& cameraPos);
+
+	void release();
+
+	uint32_t maxTreeSize = 4;
 };

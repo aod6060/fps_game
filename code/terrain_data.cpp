@@ -12,6 +12,7 @@ void TerrainData::init()
 	this->moister.resize(this->size * this->size);
 	this->blend.resize(this->size * this->size);
 	this->biomes.resize(this->size * this->size);
+	this->terrainType.resize(this->size * this->size);
 
 	// Surface
 	this->elevationSurf = SDL_CreateRGBSurfaceWithFormat(0, size, size, 1, SDL_PIXELFORMAT_BGR888);
@@ -88,6 +89,7 @@ void TerrainData::init()
 			if (me <= 0.25f)
 			{
 				this->biomes[i] = glm::vec3(0.0f, 0.0f, 1.0f);
+				this->terrainType[i] = TT_OCEAN;
 			}
 			else if (me >= 0.25f)
 			{
@@ -96,14 +98,17 @@ void TerrainData::init()
 				if (t >= 0.25 && t < 0.35)
 				{
 					this->biomes[i] = glm::vec3(194 / 256.0f, 178 / 256.0f, 128 / 256.0f);
+					this->terrainType[i] = TT_BEACH;
 				}
 				else if (t >= 0.35 && t < 0.45)
 				{
 					this->biomes[i] = glm::vec3(0.3f, 1.0f, 0.3f);
+					this->terrainType[i] = TT_GRASS;
 				}
 				else if (t >= 0.45)
 				{
-					this->biomes[i] = glm::vec3(1.0f);
+					this->biomes[i] = glm::vec3(139 / 256.0f, 69 / 256.0f, 19 / 256.0f);
+					this->terrainType[i] = TT_SNOW;
 				}
 			}
 		}
