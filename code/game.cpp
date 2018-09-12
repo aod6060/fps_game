@@ -28,7 +28,14 @@ static Camera camera;
 static Mesh waterMesh;
 static Texture2D waterTex;
 
-void drawMesh(Mesh& mesh, Texture2D& tex, const glm::vec3& pos);
+// Mini map
+static MiniMap miniMap;
+
+void drawMesh(
+	Mesh& mesh, 
+	Texture2D& tex, 
+	const glm::vec3& pos, 
+	const glm::vec3& scale);
 
 void game_init()
 {
@@ -59,7 +66,9 @@ void game_init()
 
 	int i = 0;
 
-	while(i < 256)
+	uint32_t amount = rand() % 1024 + 1;
+
+	while(i < amount)
 	{
 		int32_t size = terrain.getData()->size;
 
@@ -134,6 +143,7 @@ void game_init()
 		//camera.init(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f));
 	}
 
+	miniMap.init();
 }
 
 void game_update(float delta)
@@ -143,11 +153,18 @@ void game_update(float delta)
 		input_toggleGrab();
 	}
 
-	
+	if (input_isKeyDown(SDL_SCANCODE_1))
+	{
+		miniMap.toggleEnabled();
+	}
+
 	if (input_isGrab())
 	{
 		camera.update(delta);
 	}
+
+	miniMap.update(camera, terrain.getData());
+
 }
 
 void game_fixedUpdate()
@@ -181,12 +198,17 @@ void game_render()
 	progMain.setProjection(camera.toProjMatrix());
 	progMain.setView(camera.toViewMatrix());
 
-	drawMesh(waterMesh, waterTex, glm::vec3(0.0f, 1.0f, 0.0f) * terrain.getScale() * 0.251f);
+	drawMesh(
+		waterMesh, 
+		waterTex, 
+		glm::vec3(0.0f, 1.0f, 0.0f) * terrain.getScale() * 0.251f,
+		glm::vec3(2.0f, 0.0f, 2.0f));
 
 	drawMesh(
 		plane,
 		terrain.getData()->biomesMap,
-		planePos);
+		planePos,
+		glm::vec3(1.0f, 1.0f, 0.0f));
 	progMain.unbind();
 
 	progTerrain.bind();
@@ -200,11 +222,15 @@ void game_render()
 
 	billboardManager.render(camera.toProjMatrix(), camera.toViewMatrix(), camera.getPos());
 
+	//glClear(GL_DEPTH_BUFFER_BIT);
+	miniMap.render(terrain.getData());
 
 }
 
 void game_release()
 {
+	miniMap.release();
+
 	billboardManager.release();
 
 	waterTex.release();
@@ -223,8 +249,12 @@ void game_release()
 void drawMesh(
 	Mesh& mesh, 
 	Texture2D& tex, 
-	const glm::vec3& pos)
+	const glm::vec3& pos,
+	const glm::vec3& scale)
 {
-	progMain.setModel(glm::translate(glm::mat4(1.0f), pos));
+	progMain.setModel(
+		glm::translate(glm::mat4(1.0f), pos) *
+		glm::scale(glm::mat4(1.0f), scale));
+
 	progMain.drawMesh(mesh, tex);
 }

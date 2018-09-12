@@ -817,3 +817,44 @@ public:
 
 	uint32_t maxTreeSize = 4;
 };
+
+class MiniMap
+{
+private:
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+
+	VertexBuffer vBuf;
+	VertexBuffer vBuf2;
+	VertexBuffer tBuf;
+	IndexBuffer iBuf;
+
+	Texture2D player;
+
+	glm::vec2 pos;
+	glm::vec2 cameraPos;
+	float zrot = 0.0f;
+
+	bool enabled = false;
+
+	void renderQuad(Texture2D& quad, const glm::mat4& model);
+	void renderQuad2(Texture2D& quad, const glm::mat4& model);
+public:
+
+	void init();
+
+	void update(Camera& camera, TerrainData* data);
+
+	void render(TerrainData* data);
+
+	void release();
+
+	bool isEnabled();
+
+	void setEnabled(bool enabled);
+
+	void toggleEnabled();
+
+};
