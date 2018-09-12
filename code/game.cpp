@@ -31,6 +31,9 @@ static Texture2D waterTex;
 // Mini map
 static MiniMap miniMap;
 
+// Grass Render
+static GrassRendering grassRender;
+
 void drawMesh(
 	Mesh& mesh, 
 	Texture2D& tex, 
@@ -110,9 +113,6 @@ void game_init()
 			look = true;
 			continue;
 		}
-
-		//if(terrain.get)
-		//camera.init(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f));
 	}
 
 	look = false;
@@ -126,22 +126,14 @@ void game_init()
 
 		if (terrain.getTerrainType(_x, _z) == TT_BEACH)
 		{
-			/*
-			camera.init(
-				glm::vec3(_x, terrain.getHeight(_x, _z) + 5.5f, _z),
-				glm::vec2(0.0f, 0.0f)
-			);
-			*/
-
 			planePos = glm::vec3(_x, terrain.getHeight(_x, _z) + 2.0f, _z);
 
 			look = true;
 			continue;
 		}
-
-		//if(terrain.get)
-		//camera.init(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f));
 	}
+
+	grassRender.init(terrain.getData(), terrain.getScale());
 
 	miniMap.init();
 }
@@ -221,6 +213,7 @@ void game_render()
 	progTerrain.unbind();
 
 	billboardManager.render(camera.toProjMatrix(), camera.toViewMatrix(), camera.getPos());
+	grassRender.render(camera);
 
 	//glClear(GL_DEPTH_BUFFER_BIT);
 	miniMap.render(terrain.getData());
@@ -230,6 +223,8 @@ void game_render()
 void game_release()
 {
 	miniMap.release();
+
+	grassRender.release();
 
 	billboardManager.release();
 

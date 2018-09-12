@@ -818,6 +818,40 @@ public:
 	uint32_t maxTreeSize = 4;
 };
 
+class GrassRendering
+{
+private:
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+
+	Mesh grass;
+
+	Texture2D grass1;
+	Texture2D grass2;
+	Texture2D grass3;
+
+	VertexBuffer grass1_buf;
+	VertexBuffer grass2_buf;
+	VertexBuffer grass3_buf;
+
+	void render(Texture2D& tex, VertexBuffer& buf);
+
+public:
+
+	void add(int type, glm::vec3 pos);
+
+	void upload();
+
+	void init(TerrainData* data, float scale);
+
+	void render(Camera& camera);
+
+	void release();
+
+};
+
 class MiniMap
 {
 private:

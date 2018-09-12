@@ -143,7 +143,6 @@ void MiniMap::render(TerrainData* data)
 
 		glViewport(5, app_getHeight() - 256 - 5, 256, 256);
 
-		//glClear(GL_COLOR_BUFFER_BIT);
 		program.bind();
 		program.getUniforms()->setMat4("proj", proj);
 		program.getUniforms()->setMat4("view", view);

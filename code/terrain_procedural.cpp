@@ -54,7 +54,7 @@ void TerrainProcedural::init()
 
 	channelBlack.init("data/textures/prop/ocean.png");
 	channelRed.init("data/textures/prop/beach_sand2.png");
-	channelGreen.init("data/textures/prop/grass.png");
+	channelGreen.init("data/textures/prop/dirt_2.png");
 	channelBlue.init("data/textures/prop/dirt_2.png");
 
 

@@ -44,12 +44,18 @@ void VertexBuffer::add(const glm::vec4& v)
 
 void VertexBuffer::add(const glm::mat4& m)
 {
+	/*
 	const float* pSrc = (const float*)glm::value_ptr(m);
 
 	for (uint32_t i = 0; i < 16; i++)
 	{
 		this->add(pSrc[i]);
 	}
+	*/
+	this->add(m[0]);
+	this->add(m[1]);
+	this->add(m[2]);
+	this->add(m[3]);
 }
 
 void VertexBuffer::clear()
