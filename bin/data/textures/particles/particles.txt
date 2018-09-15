@@ -1,0 +1,9 @@
+data/textures/particles/sphere.png
+data/textures/particles/quad.png
+data/textures/particles/angry.png
+data/textures/particles/cross.png
+data/textures/particles/pentagram.png
+data/textures/particles/quad_torus.png
+data/textures/particles/swastica.png
+data/textures/particles/torus.png
+data/textures/particles/X.png

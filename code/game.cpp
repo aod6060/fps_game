@@ -34,6 +34,12 @@ static MiniMap miniMap;
 // Grass Render
 static GrassRendering grassRender;
 
+// Test Billboard
+//static TestBillboard testBillboard;
+
+// Particle System
+static ParticleSystem particleSystem;
+
 void drawMesh(
 	Mesh& mesh, 
 	Texture2D& tex, 
@@ -133,7 +139,14 @@ void game_init()
 		}
 	}
 
-	grassRender.init(terrain.getData(), terrain.getScale());
+	grassRender.init(terrain);
+
+	//testBillboard.init(camera.getPos());
+	particleSystem.init(
+		planePos,
+		glm::vec3(0.0f, 1.0f, 0.0f) * 32.0f,
+		glm::vec3(0.0f, 0.0f, 0.0f) * 16.0f,
+		1.0f);
 
 	miniMap.init();
 }
@@ -155,6 +168,9 @@ void game_update(float delta)
 		camera.update(delta);
 	}
 
+	grassRender.update(delta);
+	particleSystem.update(delta, camera, terrain);
+
 	miniMap.update(camera, terrain.getData());
 
 }
@@ -168,16 +184,6 @@ void game_fixedUpdate()
 
 void game_render()
 {
-	glm::mat4 proj =
-		glm::perspective(
-			glm::radians(45.0f), 
-			(float)app_getWidth() / (float)app_getHeight(), 
-			1.0f, 
-			1024.0f);
-
-	glm::mat4 view =
-		glm::mat4(1.0f);
-
 	glm::mat4 model =
 		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
 
@@ -201,6 +207,7 @@ void game_render()
 		terrain.getData()->biomesMap,
 		planePos,
 		glm::vec3(1.0f, 1.0f, 0.0f));
+
 	progMain.unbind();
 
 	progTerrain.bind();
@@ -215,6 +222,10 @@ void game_render()
 	billboardManager.render(camera.toProjMatrix(), camera.toViewMatrix(), camera.getPos());
 	grassRender.render(camera);
 
+	//testBillboard.render(camera);
+
+	particleSystem.render(camera);
+
 	//glClear(GL_DEPTH_BUFFER_BIT);
 	miniMap.render(terrain.getData());
 
@@ -223,6 +234,10 @@ void game_render()
 void game_release()
 {
 	miniMap.release();
+
+	particleSystem.release();
+
+	//testBillboard.release();
 
 	grassRender.release();
 

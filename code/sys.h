@@ -88,6 +88,7 @@ class VertexBuffer
 private:
 	uint32_t id;
 	std::vector<float> list;
+	bool isStatic;
 public:
 	void add(float x);
 	void add(float x, float y);
@@ -103,7 +104,7 @@ public:
 	void addAll(std::vector<glm::vec4>& v);
 	void addAll(std::vector<glm::mat4>& m);
 	void clear();
-	void create();
+	void create(bool isStatic = false);
 	void upload();
 	void bind();
 	void unbind();
@@ -354,7 +355,7 @@ private:
 
 public:
 
-	void init(std::string path);
+	void init(std::string path, bool isStatic = false);
 
 	//void render(ProgramWrapperMain& prog);
 
@@ -549,6 +550,7 @@ public:
 	TerrainType getTerrainType(float x, float z);
 	float getHeight(float x, float z);
 
+	glm::vec3 getRandomLocation(TerrainType type);
 
 	TerrainData* getData();
 
@@ -831,12 +833,33 @@ private:
 	Texture2D grass1;
 	Texture2D grass2;
 	Texture2D grass3;
+	Texture2D grass4;
+	Texture2D grass5;
+	Texture2D grass6;
+	Texture2D grass7;
+	Texture2D grass8;
+	Texture2D grass9;
+	Texture2D grass10;
 
 	VertexBuffer grass1_buf;
 	VertexBuffer grass2_buf;
 	VertexBuffer grass3_buf;
+	VertexBuffer grass4_buf;
+	VertexBuffer grass5_buf;
+	VertexBuffer grass6_buf;
+	VertexBuffer grass7_buf;
+	VertexBuffer grass8_buf;
+	VertexBuffer grass9_buf;
+	VertexBuffer grass10_buf;
+
+	std::vector<std::string> grass_path;
+
 
 	void render(Texture2D& tex, VertexBuffer& buf);
+
+	void loadGrassPath();
+
+	std::string getGrassPath();
 
 public:
 
@@ -844,7 +867,9 @@ public:
 
 	void upload();
 
-	void init(TerrainData* data, float scale);
+	void init(TerrainProcedural& prog);
+	
+	void update(float delta);
 
 	void render(Camera& camera);
 
@@ -890,5 +915,96 @@ public:
 	void setEnabled(bool enabled);
 
 	void toggleEnabled();
+
+};
+
+class TestBillboard
+{
+private:
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+
+	VertexBuffer vbuf;
+	VertexBuffer tbuf;
+
+	IndexBuffer ibuf;
+
+	glm::vec3 location;
+
+	Texture2D tex;
+
+	std::vector<std::string> ppath;
+
+	void loadParticles();
+
+	std::string getParticles();
+
+public:
+
+	void init(const glm::vec3& location);
+
+	void render(Camera& camera);
+
+	void release();
+};
+
+struct Particle
+{
+	glm::vec3 position;
+	glm::vec3 velocity;
+	float life;
+};
+
+class ParticleSystem
+{
+private:
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+
+	VertexBuffer vbuf;
+	VertexBuffer tbuf;
+
+	IndexBuffer ibuf;
+
+	Mesh monkey;
+
+	VertexBuffer matrix_buffer;
+
+	Texture2D tex;
+
+	std::vector<Particle> particles;
+
+	float maxLife = 1.0f;
+
+	glm::vec3 position;
+	glm::vec3 velocity;
+
+	glm::vec3 gravity;
+
+public:
+
+	void init(
+		const glm::vec3& position,
+		const glm::vec3& velocity,
+		const glm::vec3& gravity,
+		float maxLife);
+
+	void update(float delta, Camera& camera, TerrainProcedural& terain);
+
+	void render(Camera& camera);
+
+	void release();
+
+	void setPosition(const glm::vec3& position);
+
+	glm::vec3 getPosition();
+
+	void setMaxLife(float maxLife);
+
+	float getMaxLife();
 
 };

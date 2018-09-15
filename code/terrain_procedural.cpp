@@ -260,3 +260,26 @@ IndexBuffer* TerrainProcedural::getIndexBuffer()
 {
 	return &this->iBuf;
 }
+
+glm::vec3 TerrainProcedural::getRandomLocation(TerrainType type)
+{
+	bool look = false;
+	glm::vec3 location;
+
+	while (!look)
+	{
+		int32_t size = data.size;
+
+		float _x = (rand() % size) - (size / 2);
+		float _z = (rand() % size) - (size / 2);
+
+		if (this->getTerrainType(_x, _z) == type)
+		{
+			location = glm::vec3(_x, this->getHeight(_x, _z), _z);
+			look = true;
+			continue;
+		}
+	}
+
+	return location;
+}

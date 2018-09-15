@@ -4,7 +4,7 @@
 #include <assimp/postprocess.h>
 
 
-void Mesh::init(std::string path)
+void Mesh::init(std::string path, bool isStatic)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path.c_str(), 
@@ -66,17 +66,17 @@ void Mesh::init(std::string path)
 
 	// Vertex Buffer
 	vBuf.addAll(vertices);
-	vBuf.create();
+	vBuf.create(isStatic);
 	vBuf.upload();
 
 	// TexCoord Buffer
 	tBuf.addAll(texCoords);
-	tBuf.create();
+	tBuf.create(isStatic);
 	tBuf.upload();
 
 	// Normal Buffer
 	nBuf.addAll(normals);
-	nBuf.create();
+	nBuf.create(isStatic);
 	nBuf.upload();
 
 	// Index Buffer

@@ -63,15 +63,16 @@ void VertexBuffer::clear()
 	this->list.clear();
 }
 
-void VertexBuffer::create()
+void VertexBuffer::create(bool isStatic)
 {
 	glGenBuffers(1, &this->id);
+	this->isStatic = isStatic;
 }
 
 void VertexBuffer::upload()
 {
 	this->bind();
-	glBufferData(GL_ARRAY_BUFFER, this->size() * sizeof(float), list.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->size() * sizeof(float), list.data(), (isStatic) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
 	this->unbind();
 }
 
@@ -88,6 +89,7 @@ void VertexBuffer::unbind()
 
 void VertexBuffer::release()
 {
+	this->clear();
 	glDeleteBuffers(1, &id);
 }
 
